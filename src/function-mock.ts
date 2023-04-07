@@ -2,7 +2,12 @@ const formatContext = (context: { [key: string]: unknown }): string => JSON.stri
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createFunctionMock = <T extends (...parameters: Array<any>) => any>(
-  mocks: Array<{ parameters: Parameters<T>; return: ReturnType<T> } | { parameters: Parameters<T>; error: Error } | T>,
+  mocks: Array<
+    | { parameters: Parameters<T>; return: ReturnType<T> }
+    | { parameters: Parameters<T>; error: Error }
+    | { callback: T }
+    | T
+  >,
 ) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -15,12 +20,6 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
     // eslint-disable-next-line functional/immutable-data
     const mock = mocks.shift();
 
-    if (typeof mock === 'function') {
-      mockIndex++;
-
-      return mock(...actualParameters);
-    }
-
     if (!mock) {
       throw new Error(
         `Missing mock: ${formatContext({
@@ -28,6 +27,18 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
           mockIndex,
         })}`,
       );
+    }
+
+    if (typeof mock === 'function') {
+      mockIndex++;
+
+      return mock(...actualParameters);
+    }
+
+    if ('callback' in mock) {
+      mockIndex++;
+
+      return mock.callback(...actualParameters);
     }
 
     if (actualParameters.length !== mock.parameters.length) {

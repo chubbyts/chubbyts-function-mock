@@ -30,7 +30,7 @@ A function mock helper.
 Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-function-mock][1].
 
 ```sh
-npm i @chubbyts/chubbyts-function-mock@1.1.0
+npm i @chubbyts/chubbyts-function-mock@1.2.0
 ```
 
 ## Usage
@@ -45,12 +45,14 @@ test('my random test', () => {
   const myFunction = jest.fn(
     createFunctionMock<MyFunction>([
       { parameters: ['test', 0, 2], return: 'te' },
-      (string: string, start: number, stop: number): string => {
-        expect(string).toBe('test');
-        expect(start).toBe(1);
-        expect(stop).toBe(2);
+      {
+        callback: (string: string, start: number, stop: number): string => {
+          expect(string).toBe('test');
+          expect(start).toBe(1);
+          expect(stop).toBe(2);
 
-        return 'es';
+          return 'es';
+        }
       },
       { parameters: ['test', 0, 2], error: new Error('test') },
     ]),
