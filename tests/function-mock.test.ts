@@ -66,23 +66,35 @@ describe('function-mock', () => {
     });
 
     test('to less mocks', async () => {
-      const myFunction = jest.fn(createFunctionMock<MyFunction>([{ parameters: ['test', 0, 2], return: 'te' }]));
+      const myFunction = jest.fn(
+        createFunctionMock<MyFunction>([
+          (string: string, start: number, stop: number): string => {
+            expect(string).toBe('test');
+            expect(start).toBe(0);
+            expect(stop).toBe(2);
+
+            return 'te';
+          },
+          { parameters: ['test', 1, 2], return: 'es' },
+        ]),
+      );
 
       expect(myFunction('test', 0, 2)).toBe('te');
+      expect(myFunction('test', 1, 2)).toBe('es');
 
       try {
-        expect(myFunction('test', 1, 2)).toBe('es');
+        expect(myFunction('test', 2, 2)).toBe('st');
         throw new Error('Expect fail');
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Missing mock: {
-            "line": "69",
-            "mockIndex": 1
+            "line": "70",
+            "mockIndex": 2
           }]
         `);
       }
 
-      expect(myFunction).toBeCalledTimes(2);
+      expect(myFunction).toBeCalledTimes(3);
     });
 
     test('invalid parameter count', async () => {
@@ -96,7 +108,7 @@ describe('function-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameters count mismatch: {
-            "line": "89",
+            "line": "101",
             "mockIndex": 0,
             "actual": 2,
             "expect": 3
@@ -116,7 +128,7 @@ describe('function-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "111",
+            "line": "123",
             "mockIndex": 0,
             "parameterIndex": 2,
             "actual": 3,
