@@ -29,7 +29,7 @@ A function mock helper.
 Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-function-mock][1].
 
 ```sh
-npm i @chubbyts/chubbyts-function-mock@1.0.0
+npm i @chubbyts/chubbyts-function-mock@1.1.0
 ```
 
 ## Usage
@@ -51,13 +51,21 @@ test('my random test', () => {
 
         return 'es';
       },
+      { parameters: ['test', 0, 2], error: new Error('test') },
     ]),
   );
 
   expect(myFunction('test', 0, 2)).toBe('te');
   expect(myFunction('test', 1, 2)).toBe('es');
 
-  expect(myFunction).toBeCalledTimes(2);
+  try {
+    expect(myFunction('test', 2, 2)).toBe('st');
+    throw new Error('Expect fail');
+  } catch (e) {
+    expect(e).toMatchInlineSnapshot('[Error: test]');
+  }
+
+  expect(myFunction).toBeCalledTimes(3);
 });
 ```
 

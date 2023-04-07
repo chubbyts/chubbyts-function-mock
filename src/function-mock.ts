@@ -2,7 +2,7 @@ const formatContext = (context: { [key: string]: unknown }): string => JSON.stri
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createFunctionMock = <T extends (...parameters: Array<any>) => any>(
-  mocks: Array<{ parameters: Parameters<T>; return: ReturnType<T> } | T>,
+  mocks: Array<{ parameters: Parameters<T>; return: ReturnType<T> } | { parameters: Parameters<T>; error: Error } | T>,
 ) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -58,6 +58,10 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
     });
 
     mockIndex++;
+
+    if ('error' in mock) {
+      throw mock.error;
+    }
 
     return mock.return;
   };
