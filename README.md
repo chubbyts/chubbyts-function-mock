@@ -1,0 +1,68 @@
+# chubbyts-function-mock
+
+[![CI](https://github.com/chubbyts/chubbyts-function-mock/workflows/CI/badge.svg?branch=master)](https://github.com/chubbyts/chubbyts-function-mock/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/github/chubbyts/chubbyts-function-mock/badge.svg?branch=master)](https://coveralls.io/github/chubbyts/chubbyts-function-mock?branch=master)
+[![Infection MSI](https://badge.stryker-mutator.io/github.com/chubbyts/chubbyts-function-mock/master)](https://dashboard.stryker-mutator.io/reports/github.com/chubbyts/chubbyts-function-mock/master)
+
+[![bugs](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=bugs)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+[![code_smells](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=code_smells)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+[![coverage](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=coverage)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+[![duplicated_lines_density](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+[![ncloc](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=ncloc)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+[![sqale_rating](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+[![alert_status](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=alert_status)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+[![reliability_rating](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+[![security_rating](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=security_rating)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+[![sqale_index](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=sqale_index)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+[![vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=chubbyts_chubbyts-function-mock&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=chubbyts_chubbyts-function-mock)
+
+## Description
+
+A function mock helper.
+
+## Requirements
+
+ * node: 16
+
+## Installation
+
+Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-function-mock][1].
+
+```sh
+npm i @chubbyts/chubbyts-function-mock@1.0.0
+```
+
+## Usage
+
+```ts
+import { expect, test } from '@jest/globals';
+import { createFunctionMock } from '@chubbyts/chubbyts-function-mock/dist/function-mock';
+
+type MyFunction = (string: string, start: number, stop: number) => string;
+
+test('my random test', () => {
+  const myFunction = jest.fn(
+    createFunctionMock<MyFunction>([
+      { parameters: ['test', 0, 2], return: 'te' },
+      (string: string, start: number, stop: number): string => {
+        expect(string).toBe('test');
+        expect(start).toBe(1);
+        expect(stop).toBe(2);
+
+        return 'es';
+      },
+    ]),
+  );
+
+  expect(myFunction('test', 0, 2)).toBe('te');
+  expect(myFunction('test', 1, 2)).toBe('es');
+
+  expect(myFunction).toBeCalledTimes(2);
+});
+```
+
+## Copyright
+
+2023 Dominik Zogg
+
+[1]: https://www.npmjs.com/package/@chubbyts/chubbyts-function-mock

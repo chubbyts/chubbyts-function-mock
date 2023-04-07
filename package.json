@@ -1,0 +1,61 @@
+{
+  "name": "@chubbyts/chubbyts-function-mock",
+  "version": "1.0.0",
+  "description": "A function mock helper.",
+  "keywords": [
+    "chubbyts",
+    "jest",
+    "mock"
+  ],
+  "author": "Dominik Zogg",
+  "license": "MIT",
+  "repository": "chubbyts/chubbyts-function-mock",
+  "scripts": {
+    "cs-fix": "prettier --write src tests",
+    "cs": "prettier --check src tests",
+    "lint-fix": "eslint src tests --fix",
+    "lint": "eslint src tests",
+    "test": "jest",
+    "infection": "stryker run",
+    "build": "rm -Rf dist && tsc",
+    "prepare": "npm run build"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.ts"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "lines": 100
+      }
+    }
+  },
+  "prettier": {
+    "printWidth": 120,
+    "tabWidth": 2,
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "devDependencies": {
+    "@chubbyts/chubbyts-eslint": "^1.0.0",
+    "@stryker-mutator/core": "^6.4.2",
+    "@stryker-mutator/jest-runner": "^6.4.2",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^18.15.11",
+    "jest": "^29.5.0",
+    "prettier": "^2.8.7",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
