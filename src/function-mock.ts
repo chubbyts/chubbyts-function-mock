@@ -1,14 +1,17 @@
 const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context, null, 2);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FunctionMocks<T extends (...parameters: Array<any>) => any> = Array<
+  | { parameters: Parameters<T>; return: ReturnType<T> }
+  | { parameters: Parameters<T>; error: Error }
+  | { callback: T }
+  | T
+>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createFunctionMock = <T extends (...parameters: Array<any>) => any>(
-  mocks: Array<
-    | { parameters: Parameters<T>; return: ReturnType<T> }
-    | { parameters: Parameters<T>; error: Error }
-    | { callback: T }
-    | T
-  >,
-) => {
+  mocks: FunctionMocks<T>,
+): ((...parameters: Parameters<T>) => ReturnType<T>) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const [_, line] = new Error().stack.match(/Object.<anonymous> \(([^)]+)\)/)[1].split(':');
@@ -16,7 +19,7 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
   // eslint-disable-next-line functional/no-let
   let mockIndex = 0;
 
-  return (...actualParameters: Parameters<T>) => {
+  return (...actualParameters: Parameters<T>): ReturnType<T> => {
     // eslint-disable-next-line functional/immutable-data
     const mock = mocks.shift();
 

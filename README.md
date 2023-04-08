@@ -37,26 +37,27 @@ npm i @chubbyts/chubbyts-function-mock@1.2.0
 
 ```ts
 import { expect, test } from '@jest/globals';
+import type { FunctionMocks } from '@chubbyts/chubbyts-function-mock/dist/function-mock';
 import { createFunctionMock } from '@chubbyts/chubbyts-function-mock/dist/function-mock';
 
 type MyFunction = (string: string, start: number, stop: number) => string;
 
 test('my random test', () => {
-  const myFunction = jest.fn(
-    createFunctionMock<MyFunction>([
-      { parameters: ['test', 0, 2], return: 'te' },
-      {
-        callback: (string: string, start: number, stop: number): string => {
-          expect(string).toBe('test');
-          expect(start).toBe(1);
-          expect(stop).toBe(2);
+  const myFunctionMocks: Mocks<MyFunction> = [
+    { parameters: ['test', 0, 2], return: 'te' },
+    {
+      callback: (string: string, start: number, stop: number): string => {
+        expect(string).toBe('test');
+        expect(start).toBe(1);
+        expect(stop).toBe(2);
 
-          return 'es';
-        }
-      },
-      { parameters: ['test', 0, 2], error: new Error('test') },
-    ]),
-  );
+        return 'es';
+      }
+    },
+    { parameters: ['test', 0, 2], error: new Error('test') },
+  ];
+
+  const myFunction = createFunctionMock(myFunctionMocks);
 
   expect(myFunction('test', 0, 2)).toBe('te');
   expect(myFunction('test', 1, 2)).toBe('es');
@@ -68,7 +69,8 @@ test('my random test', () => {
     expect(e).toMatchInlineSnapshot('[Error: test]');
   }
 
-  expect(myFunction).toBeCalledTimes(3);
+  // if you want to be sure, that all mocks are called
+  expect(myFunctionMocks.length).toBe(0);
 });
 ```
 

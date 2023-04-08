@@ -1,4 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
+import type { FunctionMocks } from '../src/function-mock';
 import { createFunctionMock } from '../src/function-mock';
 
 type MyFunction = (string: string, start: number, stop: number) => string;
@@ -6,26 +7,27 @@ type MyFunction = (string: string, start: number, stop: number) => string;
 describe('function-mock', () => {
   describe('createFunctionMock', () => {
     test('mocks are {parameters: ..., return: ... }', async () => {
-      const myFunction = jest.fn(
-        createFunctionMock<MyFunction>([
-          { parameters: ['test', 0, 2], return: 'te' },
-          { parameters: ['test', 1, 2], return: 'es' },
-        ]),
-      );
+      const myFunctionMocks: FunctionMocks<MyFunction> = [
+        { parameters: ['test', 0, 2], return: 'te' },
+        { parameters: ['test', 1, 2], return: 'es' },
+      ];
+
+      const myFunction = createFunctionMock(myFunctionMocks);
 
       expect(myFunction('test', 0, 2)).toBe('te');
       expect(myFunction('test', 1, 2)).toBe('es');
 
-      expect(myFunction).toBeCalledTimes(2);
+      // if you want to be sure, that all mocks are called
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('mocks are {parameters: ..., return: ..., error: ... }', async () => {
-      const myFunction = jest.fn(
-        createFunctionMock<MyFunction>([
-          { parameters: ['test', 0, 2], return: 'te' },
-          { parameters: ['test', 1, 2], error: new Error('test') },
-        ]),
-      );
+      const myFunctionMocks: FunctionMocks<MyFunction> = [
+        { parameters: ['test', 0, 2], return: 'te' },
+        { parameters: ['test', 1, 2], error: new Error('test') },
+      ];
+
+      const myFunction = createFunctionMock(myFunctionMocks);
 
       expect(myFunction('test', 0, 2)).toBe('te');
 
@@ -36,98 +38,102 @@ describe('function-mock', () => {
         expect(e).toMatchInlineSnapshot('[Error: test]');
       }
 
-      expect(myFunction).toBeCalledTimes(2);
+      // if you want to be sure, that all mocks are called
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('mocks are {callback: ...}', async () => {
-      const myFunction = jest.fn(
-        createFunctionMock<MyFunction>([
-          {
-            callback: (string: string, start: number, stop: number): string => {
-              expect(string).toBe('test');
-              expect(start).toBe(0);
-              expect(stop).toBe(2);
+      const myFunctionMocks: FunctionMocks<MyFunction> = [
+        {
+          callback: (string: string, start: number, stop: number): string => {
+            expect(string).toBe('test');
+            expect(start).toBe(0);
+            expect(stop).toBe(2);
 
-              return 'te';
-            },
+            return 'te';
           },
-          {
-            callback: (string: string, start: number, stop: number): string => {
-              expect(string).toBe('test');
-              expect(start).toBe(1);
-              expect(stop).toBe(2);
+        },
+        {
+          callback: (string: string, start: number, stop: number): string => {
+            expect(string).toBe('test');
+            expect(start).toBe(1);
+            expect(stop).toBe(2);
 
-              return 'es';
-            },
+            return 'es';
           },
-        ]),
-      );
+        },
+      ];
+
+      const myFunction = createFunctionMock(myFunctionMocks);
 
       expect(myFunction('test', 0, 2)).toBe('te');
       expect(myFunction('test', 1, 2)).toBe('es');
 
-      expect(myFunction).toBeCalledTimes(2);
+      // if you want to be sure, that all mocks are called
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('mocks are functions', async () => {
-      const myFunction = jest.fn(
-        createFunctionMock<MyFunction>([
-          (string: string, start: number, stop: number): string => {
-            expect(string).toBe('test');
-            expect(start).toBe(0);
-            expect(stop).toBe(2);
+      const myFunctionMocks: FunctionMocks<MyFunction> = [
+        (string: string, start: number, stop: number): string => {
+          expect(string).toBe('test');
+          expect(start).toBe(0);
+          expect(stop).toBe(2);
 
-            return 'te';
-          },
-          (string: string, start: number, stop: number): string => {
-            expect(string).toBe('test');
-            expect(start).toBe(1);
-            expect(stop).toBe(2);
+          return 'te';
+        },
+        (string: string, start: number, stop: number): string => {
+          expect(string).toBe('test');
+          expect(start).toBe(1);
+          expect(stop).toBe(2);
 
-            return 'es';
-          },
-        ]),
-      );
+          return 'es';
+        },
+      ];
+
+      const myFunction = createFunctionMock(myFunctionMocks);
 
       expect(myFunction('test', 0, 2)).toBe('te');
       expect(myFunction('test', 1, 2)).toBe('es');
 
-      expect(myFunction).toBeCalledTimes(2);
+      // if you want to be sure, that all mocks are called
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('mocks are {parameters: ..., return: ... } or functions', async () => {
-      const myFunction = jest.fn(
-        createFunctionMock<MyFunction>([
-          { parameters: ['test', 0, 2], return: 'te' },
-          (string: string, start: number, stop: number): string => {
-            expect(string).toBe('test');
-            expect(start).toBe(1);
-            expect(stop).toBe(2);
+      const myFunctionMocks: FunctionMocks<MyFunction> = [
+        { parameters: ['test', 0, 2], return: 'te' },
+        (string: string, start: number, stop: number): string => {
+          expect(string).toBe('test');
+          expect(start).toBe(1);
+          expect(stop).toBe(2);
 
-            return 'es';
-          },
-        ]),
-      );
+          return 'es';
+        },
+      ];
+
+      const myFunction = createFunctionMock(myFunctionMocks);
 
       expect(myFunction('test', 0, 2)).toBe('te');
       expect(myFunction('test', 1, 2)).toBe('es');
 
-      expect(myFunction).toBeCalledTimes(2);
+      // if you want to be sure, that all mocks are called
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('to less mocks', async () => {
-      const myFunction = jest.fn(
-        createFunctionMock<MyFunction>([
-          (string: string, start: number, stop: number): string => {
-            expect(string).toBe('test');
-            expect(start).toBe(0);
-            expect(stop).toBe(2);
+      const myFunctionMocks: FunctionMocks<MyFunction> = [
+        (string: string, start: number, stop: number): string => {
+          expect(string).toBe('test');
+          expect(start).toBe(0);
+          expect(stop).toBe(2);
 
-            return 'te';
-          },
-          { parameters: ['test', 1, 2], return: 'es' },
-        ]),
-      );
+          return 'te';
+        },
+        { parameters: ['test', 1, 2], return: 'es' },
+      ];
+
+      const myFunction = createFunctionMock(myFunctionMocks);
 
       expect(myFunction('test', 0, 2)).toBe('te');
       expect(myFunction('test', 1, 2)).toBe('es');
@@ -138,17 +144,20 @@ describe('function-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Missing mock: {
-            "line": "120",
+            "line": "136",
             "mockIndex": 2
           }]
         `);
       }
 
-      expect(myFunction).toBeCalledTimes(3);
+      // if you want to be sure, that all mocks are called
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('invalid parameter count', async () => {
-      const myFunction = jest.fn(createFunctionMock<MyFunction>([{ parameters: ['test', 0, 2], return: 'te' }]));
+      const myFunctionMocks: FunctionMocks<MyFunction> = [{ parameters: ['test', 0, 2], return: 'te' }];
+
+      const myFunction = createFunctionMock(myFunctionMocks);
 
       try {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -158,7 +167,7 @@ describe('function-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameters count mismatch: {
-            "line": "151",
+            "line": "160",
             "mockIndex": 0,
             "actual": 2,
             "expect": 3
@@ -166,11 +175,14 @@ describe('function-mock', () => {
         `);
       }
 
-      expect(myFunction).toBeCalledTimes(1);
+      // if you want to be sure, that all mocks are called
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('invalid parameter', async () => {
-      const myFunction = jest.fn(createFunctionMock<MyFunction>([{ parameters: ['test', 0, 2], return: 'te' }]));
+      const myFunctionMocks: FunctionMocks<MyFunction> = [{ parameters: ['test', 0, 2], return: 'te' }];
+
+      const myFunction = createFunctionMock(myFunctionMocks);
 
       try {
         expect(myFunction('test', 0, 3)).toBe('te');
@@ -178,7 +190,7 @@ describe('function-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "173",
+            "line": "185",
             "mockIndex": 0,
             "parameterIndex": 2,
             "actual": 3,
@@ -187,7 +199,8 @@ describe('function-mock', () => {
         `);
       }
 
-      expect(myFunction).toBeCalledTimes(1);
+      // if you want to be sure, that all mocks are called
+      expect(myFunctionMocks.length).toBe(0);
     });
   });
 });
