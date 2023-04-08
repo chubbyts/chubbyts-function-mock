@@ -6,7 +6,7 @@ type MyFunction = (string: string, start: number, stop: number) => string;
 
 describe('function-mock', () => {
   describe('createFunctionMock', () => {
-    test('mocks are {parameters: ..., return: ... }', async () => {
+    test('mocks with return', async () => {
       const myFunctionMocks: FunctionMocks<MyFunction> = [
         { parameters: ['test', 0, 2], return: 'te' },
         { parameters: ['test', 1, 2], return: 'es' },
@@ -21,7 +21,7 @@ describe('function-mock', () => {
       expect(myFunctionMocks.length).toBe(0);
     });
 
-    test('mocks are {parameters: ..., return: ..., error: ... }', async () => {
+    test('mocks with return or error', async () => {
       const myFunctionMocks: FunctionMocks<MyFunction> = [
         { parameters: ['test', 0, 2], return: 'te' },
         { parameters: ['test', 1, 2], error: new Error('test') },
@@ -42,7 +42,7 @@ describe('function-mock', () => {
       expect(myFunctionMocks.length).toBe(0);
     });
 
-    test('mocks are {callback: ...}', async () => {
+    test('mocks with callback function', async () => {
       const myFunctionMocks: FunctionMocks<MyFunction> = [
         {
           callback: (string: string, start: number, stop: number): string => {
@@ -73,7 +73,7 @@ describe('function-mock', () => {
       expect(myFunctionMocks.length).toBe(0);
     });
 
-    test('mocks are functions', async () => {
+    test('mocks with function', async () => {
       const myFunctionMocks: FunctionMocks<MyFunction> = [
         (string: string, start: number, stop: number): string => {
           expect(string).toBe('test');
@@ -100,7 +100,7 @@ describe('function-mock', () => {
       expect(myFunctionMocks.length).toBe(0);
     });
 
-    test('mocks are {parameters: ..., return: ... } or functions', async () => {
+    test('mocks with return or functions', async () => {
       const myFunctionMocks: FunctionMocks<MyFunction> = [
         { parameters: ['test', 0, 2], return: 'te' },
         (string: string, start: number, stop: number): string => {
