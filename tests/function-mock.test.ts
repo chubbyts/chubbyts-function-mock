@@ -134,22 +134,30 @@ describe('function-mock', () => {
             return 'te';
           },
         },
-        { parameters: ['test', 1, 2], return: 'es' },
+        (string: string, start: number, stop: number): string => {
+          expect(string).toBe('test');
+          expect(start).toBe(1);
+          expect(stop).toBe(2);
+
+          return 'es';
+        },
+        { parameters: ['test', 2, 2], return: 'st' },
       ];
 
       const myFunction = createFunctionMock(myFunctionMocks);
 
       expect(myFunction('test', 0, 2)).toBe('te');
       expect(myFunction('test', 1, 2)).toBe('es');
+      expect(myFunction('test', 2, 2)).toBe('st');
 
       try {
-        expect(myFunction('test', 2, 2)).toBe('st');
+        expect(myFunction('test', 3, 1)).toBe('t');
         throw new Error('Expect fail');
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Missing mock: {
-            "line": "140",
-            "mockIndex": 2
+            "line": "147",
+            "mockIndex": 3
           }]
         `);
       }
@@ -158,7 +166,7 @@ describe('function-mock', () => {
       expect(myFunctionMocks.length).toBe(0);
     });
 
-    test('invalid parameter count', async () => {
+    test('parameters count mismatch', async () => {
       const myFunctionMocks: FunctionMocks<MyFunction> = [{ parameters: ['test', 0, 2], return: 'te' }];
 
       const myFunction = createFunctionMock(myFunctionMocks);
@@ -171,7 +179,7 @@ describe('function-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameters count mismatch: {
-            "line": "164",
+            "line": "172",
             "mockIndex": 0,
             "actual": 2,
             "expect": 3
@@ -183,7 +191,7 @@ describe('function-mock', () => {
       expect(myFunctionMocks.length).toBe(0);
     });
 
-    test('invalid parameter', async () => {
+    test('parameter mismatch', async () => {
       const myFunctionMocks: FunctionMocks<MyFunction> = [{ parameters: ['test', 0, 2], return: 'te' }];
 
       const myFunction = createFunctionMock(myFunctionMocks);
@@ -194,7 +202,7 @@ describe('function-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "189",
+            "line": "197",
             "mockIndex": 0,
             "parameterIndex": 2,
             "actual": 3,
