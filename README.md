@@ -43,7 +43,7 @@ import { createFunctionMock } from '@chubbyts/chubbyts-function-mock/dist/functi
 type MyFunction = (string: string, start: number, stop: number) => string;
 
 test('my random test', () => {
-  const myFunctionMocks: Mocks<MyFunction> = [
+  const myFunctionMocks: FunctionMocks<MyFunction> = [
     { parameters: ['test', 0, 2], return: 'te' },
     {
       callback: (string: string, start: number, stop: number): string => {
