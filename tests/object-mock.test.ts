@@ -2,16 +2,54 @@ import { describe, expect, test } from '@jest/globals';
 import type { ObjectMocks } from '../src/object-mock';
 import { createObjectMock } from '../src/object-mock';
 
-type MyObject = {
+type MyType = {
   substring: (string: string, start: number, stop: number) => string;
   uppercase: (string: string) => string;
-  self: () => MyObject;
+  self: () => MyType;
+  type: string;
 };
+
+interface MyInterface {
+  substring: (string: string, start: number, stop: number) => string;
+  uppercase: (string: string) => string;
+  self: () => MyType;
+  type: string;
+}
 
 describe('object-mock', () => {
   describe('createFunctionMock', () => {
+    test('mocks with value', async () => {
+      const myObjectMocks: ObjectMocks<MyType> = [
+        { name: 'type', value: 'value1' },
+        { name: 'type', value: 'value2' },
+      ];
+
+      const myObject = createObjectMock(myObjectMocks);
+
+      expect(myObject.type).toBe('value1');
+      expect(myObject.type).toBe('value2');
+
+      // if you want to be sure, that all mocks are called
+      expect(myObjectMocks.length).toBe(0);
+    });
+
     test('mocks with return', async () => {
-      const myObjectMocks: ObjectMocks<MyObject> = [
+      const myObjectMocks: ObjectMocks<MyType> = [
+        { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
+        { name: 'substring', parameters: ['test', 1, 2], return: 'es' },
+      ];
+
+      const myObject = createObjectMock(myObjectMocks);
+
+      expect(myObject.substring('test', 0, 2)).toBe('te');
+      expect(myObject.substring('test', 1, 2)).toBe('es');
+
+      // if you want to be sure, that all mocks are called
+      expect(myObjectMocks.length).toBe(0);
+    });
+
+    test('mocks with interface', async () => {
+      const myObjectMocks: ObjectMocks<MyInterface> = [
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         { name: 'substring', parameters: ['test', 1, 2], return: 'es' },
       ];
@@ -26,7 +64,7 @@ describe('object-mock', () => {
     });
 
     test('mocks with returnSelf', async () => {
-      const myObjectMocks: ObjectMocks<MyObject> = [
+      const myObjectMocks: ObjectMocks<MyType> = [
         { name: 'self', parameters: [], returnSelf: true },
         { name: 'self', parameters: [], returnSelf: true },
       ];
@@ -41,7 +79,7 @@ describe('object-mock', () => {
     });
 
     test('mocks with return or error', async () => {
-      const myObjectMocks: ObjectMocks<MyObject> = [
+      const myObjectMocks: ObjectMocks<MyType> = [
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         { name: 'substring', parameters: ['test', 1, 2], error: new Error('test') },
       ];
@@ -62,7 +100,7 @@ describe('object-mock', () => {
     });
 
     test('mocks with callback function', async () => {
-      const myObjectMocks: ObjectMocks<MyObject> = [
+      const myObjectMocks: ObjectMocks<MyType> = [
         {
           name: 'substring',
           callback: (string: string, start: number, stop: number): string => {
@@ -95,7 +133,7 @@ describe('object-mock', () => {
     });
 
     test('mocks with return or callback function', async () => {
-      const myObjectMocks: ObjectMocks<MyObject> = [
+      const myObjectMocks: ObjectMocks<MyType> = [
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         {
           name: 'substring',
@@ -119,7 +157,7 @@ describe('object-mock', () => {
     });
 
     test('mocks with return and different methods', async () => {
-      const myObjectMocks: ObjectMocks<MyObject> = [
+      const myObjectMocks: ObjectMocks<MyType> = [
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         { name: 'uppercase', parameters: ['test'], return: 'TEST' },
         { name: 'substring', parameters: ['test', 1, 2], return: 'es' },
@@ -138,7 +176,7 @@ describe('object-mock', () => {
     });
 
     test('to less mocks', async () => {
-      const myObjectMocks: ObjectMocks<MyObject> = [
+      const myObjectMocks: ObjectMocks<MyType> = [
         {
           name: 'substring',
           callback: (string: string, start: number, stop: number): string => {
@@ -163,7 +201,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Missing mock: {
-            "line": "155",
+            "line": "193",
             "mockIndex": 2
           }]
         `);
@@ -174,7 +212,8 @@ describe('object-mock', () => {
     });
 
     test('method name mismatch', async () => {
-      const myObjectMocks: ObjectMocks<MyObject> = [
+      const myObjectMocks: ObjectMocks<MyType> = [
+        { name: 'type', value: 'value1' },
         {
           name: 'substring',
           callback: (string: string, start: number, stop: number): string => {
@@ -190,6 +229,7 @@ describe('object-mock', () => {
 
       const myObject = createObjectMock(myObjectMocks);
 
+      expect(myObject.type).toBe('value1');
       expect(myObject.substring('test', 0, 2)).toBe('te');
 
       try {
@@ -198,8 +238,8 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Method name mismatch: {
-            "line": "191",
-            "mockIndex": 1,
+            "line": "230",
+            "mockIndex": 2,
             "actual": "substring",
             "expect": "uppercase"
           }]
@@ -211,7 +251,7 @@ describe('object-mock', () => {
     });
 
     test('parameters count mismatch', async () => {
-      const myObjectMocks: ObjectMocks<MyObject> = [{ name: 'substring', parameters: ['test', 0, 2], return: 'te' }];
+      const myObjectMocks: ObjectMocks<MyType> = [{ name: 'substring', parameters: ['test', 0, 2], return: 'te' }];
 
       const myObject = createObjectMock(myObjectMocks);
 
@@ -223,7 +263,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameters count mismatch: {
-            "line": "216",
+            "line": "256",
             "mockIndex": 0,
             "name": "substring",
             "actual": 2,
@@ -237,7 +277,7 @@ describe('object-mock', () => {
     });
 
     test('parameter mismatch', async () => {
-      const myObjectMocks: ObjectMocks<MyObject> = [
+      const myObjectMocks: ObjectMocks<MyType> = [
         { name: 'self', parameters: [], returnSelf: true },
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
       ];
@@ -252,7 +292,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "245",
+            "line": "285",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 2,

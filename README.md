@@ -30,7 +30,7 @@ A function mock helper.
 Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-function-mock][1].
 
 ```sh
-npm i @chubbyts/chubbyts-function-mock@1.2.1
+npm i @chubbyts/chubbyts-function-mock@1.2.2
 ```
 
 ## Usage
@@ -83,13 +83,13 @@ import { expect, test } from '@jest/globals';
 import type { ObjectMocks } from '@chubbyts/chubbyts-function-mock/dist/object-mock';
 import { createObjectMock } from '@chubbyts/chubbyts-function-mock/dist/object-mock';
 
-type MyObject = {
+type MyType = {
   substring: (string: string, start: number, stop: number) => string;
   uppercase: (string: string) => string;
 };
 
 test('my random test', () => {
-  const myObjectMocks: ObjectMocks<MyFunction> = [
+  const MyTypeMocks: ObjectMocks<MyType> = [
     { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
     {
       name: 'substring',
@@ -104,20 +104,20 @@ test('my random test', () => {
     { name: 'uppercase', parameters: ['test'], error: new Error('test') },
   ];
 
-  const myObject = createObjectMock(myObjectMocks);
+  const MyType = createObjectMock(MyTypeMocks);
 
-  expect(myObject.substring('test', 0, 2)).toBe('te');
-  expect(myObject.substring('test', 1, 2)).toBe('es');
+  expect(MyType.substring('test', 0, 2)).toBe('te');
+  expect(MyType.substring('test', 1, 2)).toBe('es');
 
   try {
-    expect(myObject.uppercase('test')).toBe('st');
+    expect(MyType.uppercase('test')).toBe('st');
     throw new Error('Expect fail');
   } catch (e) {
     expect(e).toMatchInlineSnapshot('[Error: test]');
   }
 
   // if you want to be sure, that all mocks are called
-  expect(myObjectMocks.length).toBe(0);
+  expect(MyTypeMocks.length).toBe(0);
 });
 ```
 
