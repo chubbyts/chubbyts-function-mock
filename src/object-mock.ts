@@ -11,7 +11,7 @@ export type ObjectMocks<T extends { [key: string]: (...parameters: Array<any>) =
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createObjectMock = <T extends { [key: string]: (...parameters: Array<any>) => any }>(
   mocks: ObjectMocks<T>,
-): { [key: string]: (...parameters: Parameters<T[keyof T]>) => ReturnType<T[keyof T]> | T } => {
+): T => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const [_, line] = new Error().stack.match(/Object.<anonymous> \(([^)]+)\)/)[1].split(':');
