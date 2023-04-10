@@ -1,15 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context, null, 2);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ObjectMocks<T extends Record<string, any>> = Array<
-  | { name: keyof T; value: T[keyof T] } // property
-  | { name: keyof T; parameters: Parameters<T[keyof T]>; return: ReturnType<T[keyof T]> }
-  | { name: keyof T; parameters: Parameters<T[keyof T]>; returnSelf: true }
-  | { name: keyof T; parameters: Parameters<T[keyof T]>; error: Error }
-  | { name: keyof T; callback: T[keyof T] }
+  {
+    [K in keyof T]: T[K] extends (...parameters: Array<any>) => any
+      ? ReturnType<T[K]> extends T
+        ?
+            | { name: K; parameters: Parameters<T[K]>; returnSelf: true }
+            | { name: K; parameters: Parameters<T[K]>; error: Error }
+            | { name: K; callback: T[K] }
+        :
+            | { name: K; parameters: Parameters<T[K]>; return: ReturnType<T[K]> }
+            | { name: K; parameters: Parameters<T[K]>; error: Error }
+            | { name: K; callback: T[K] }
+      : { name: K; value: T[K] };
+  }[keyof T]
 >;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMocks<T>): T => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -49,7 +57,7 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
         return mock.value;
       }
 
-      return (...actualParameters: Parameters<T[keyof T]>): ReturnType<T[keyof T]> | T => {
+      return (...actualParameters: Parameters<T[keyof T]>) => {
         if ('callback' in mock) {
           mockIndex++;
 

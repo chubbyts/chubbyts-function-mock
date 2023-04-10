@@ -30,7 +30,7 @@ A function mock helper.
 Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-function-mock][1].
 
 ```sh
-npm i @chubbyts/chubbyts-function-mock@1.2.2
+npm i @chubbyts/chubbyts-function-mock@1.2.3
 ```
 
 ## Usage
