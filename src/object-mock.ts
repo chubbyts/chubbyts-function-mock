@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { deepStrictEqual } from 'assert';
+
 const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context, null, 2);
 
 export type ObjectMocks<T extends Record<string, any>> = Array<
@@ -7,12 +9,12 @@ export type ObjectMocks<T extends Record<string, any>> = Array<
     [K in keyof T]: T[K] extends (...parameters: Array<any>) => any
       ? ReturnType<T[K]> extends T
         ?
-            | { name: K; parameters: Parameters<T[K]>; returnSelf: true }
-            | { name: K; parameters: Parameters<T[K]>; error: Error }
+            | { name: K; parameters: Parameters<T[K]>; returnSelf: true; strict?: true }
+            | { name: K; parameters: Parameters<T[K]>; error: Error; strict?: true }
             | { name: K; callback: T[K] }
         :
-            | { name: K; parameters: Parameters<T[K]>; return: ReturnType<T[K]> }
-            | { name: K; parameters: Parameters<T[K]>; error: Error }
+            | { name: K; parameters: Parameters<T[K]>; return: ReturnType<T[K]>; strict?: true }
+            | { name: K; parameters: Parameters<T[K]>; error: Error; strict?: true }
             | { name: K; callback: T[K] }
       : { name: K; value: T[K] };
   }[keyof T]
@@ -79,17 +81,34 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
         mock.parameters.forEach((expect: unknown, parameterIndex: number) => {
           const actual = actualParameters[parameterIndex];
 
-          if (actual !== expect) {
-            throw new Error(
-              `Parameter mismatch: ${formatContext({
-                line,
-                mockIndex,
-                name: mock.name,
-                parameterIndex,
-                actual,
-                expect,
-              })}`,
-            );
+          if (mock.strict) {
+            if (actual !== expect) {
+              throw new Error(
+                `Parameter mismatch: ${formatContext({
+                  line,
+                  mockIndex,
+                  name: mock.name,
+                  parameterIndex,
+                  actual,
+                  expect,
+                })}`,
+              );
+            }
+          } else {
+            try {
+              deepStrictEqual(actual, expect);
+            } catch {
+              throw new Error(
+                `Parameter mismatch: ${formatContext({
+                  line,
+                  mockIndex,
+                  name: mock.name,
+                  parameterIndex,
+                  actual,
+                  expect,
+                })}`,
+              );
+            }
           }
         });
 

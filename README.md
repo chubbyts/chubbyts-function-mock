@@ -21,6 +21,8 @@
 
 A function mock helper.
 
+**IMPORTANT**: "deepStrictEqual" is used for parameter comparsion, "===" if you pass `strict: true`
+
 ## Requirements
 
  * node: 16
@@ -30,7 +32,7 @@ A function mock helper.
 Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-function-mock][1].
 
 ```sh
-npm i @chubbyts/chubbyts-function-mock@1.2.3
+npm i @chubbyts/chubbyts-function-mock@1.2.4
 ```
 
 ## Usage

@@ -1,14 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { deepStrictEqual } from 'assert';
+
 const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context, null, 2);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FunctionMocks<T extends (...parameters: Array<any>) => any> = Array<
-  | { parameters: Parameters<T>; return: ReturnType<T> }
-  | { parameters: Parameters<T>; error: Error }
+  | { parameters: Parameters<T>; return: ReturnType<T>; strict?: true }
+  | { parameters: Parameters<T>; error: Error; strict?: true }
   | { callback: T }
   | T
 >;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createFunctionMock = <T extends (...parameters: Array<any>) => any>(
   mocks: FunctionMocks<T>,
 ): ((...parameters: Parameters<T>) => ReturnType<T>) => {
@@ -58,16 +60,32 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
     mock.parameters.forEach((expect: unknown, parameterIndex: number) => {
       const actual = actualParameters[parameterIndex];
 
-      if (actual !== expect) {
-        throw new Error(
-          `Parameter mismatch: ${formatContext({
-            line,
-            mockIndex,
-            parameterIndex,
-            actual,
-            expect,
-          })}`,
-        );
+      if (mock.strict) {
+        if (actual !== expect) {
+          throw new Error(
+            `Parameter mismatch: ${formatContext({
+              line,
+              mockIndex,
+              parameterIndex,
+              actual,
+              expect,
+            })}`,
+          );
+        }
+      } else {
+        try {
+          deepStrictEqual(actual, expect);
+        } catch {
+          throw new Error(
+            `Parameter mismatch: ${formatContext({
+              line,
+              mockIndex,
+              parameterIndex,
+              actual,
+              expect,
+            })}`,
+          );
+        }
       }
     });
 

@@ -3,14 +3,14 @@ import type { ObjectMocks } from '../src/object-mock';
 import { createObjectMock } from '../src/object-mock';
 
 type MyType = {
-  substring: (string: string, start: number, stop: number) => string;
+  substring: (string: string, start: number, stop: number, context?: { [key: string]: unknown }) => string;
   uppercase: (string: string) => string;
   self: () => MyType;
   type: string;
 };
 
 interface MyInterface {
-  substring: (string: string, start: number, stop: number) => string;
+  substring: (string: string, start: number, stop: number, context?: { [key: string]: unknown }) => string;
   uppercase: (string: string) => string;
   self: () => MyType;
   type: string;
@@ -34,15 +34,21 @@ describe('object-mock', () => {
     });
 
     test('mocks with return', async () => {
+      const context = { key: 'value' };
+
       const myObjectMocks: ObjectMocks<MyType> = [
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         { name: 'substring', parameters: ['test', 1, 2], return: 'es' },
+        { name: 'substring', parameters: ['test', 2, 2, { key: 'value' }], return: 'st' },
+        { name: 'substring', parameters: ['test', 2, 2, context], return: 'st', strict: true },
       ];
 
       const myObject = createObjectMock(myObjectMocks);
 
       expect(myObject.substring('test', 0, 2)).toBe('te');
       expect(myObject.substring('test', 1, 2)).toBe('es');
+      expect(myObject.substring('test', 2, 2, { key: 'value' })).toBe('st');
+      expect(myObject.substring('test', 2, 2, context)).toBe('st');
 
       // if you want to be sure, that all mocks are called
       expect(myObjectMocks.length).toBe(0);
@@ -196,12 +202,12 @@ describe('object-mock', () => {
       expect(myObject.substring('test', 1, 2)).toBe('es');
 
       try {
-        expect(myObject.substring('test', 2, 2)).toBe('st');
+        myObject.substring('test', 2, 2);
         throw new Error('Expect fail');
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Missing mock: {
-            "line": "193",
+            "line": "199",
             "mockIndex": 2
           }]
         `);
@@ -233,12 +239,12 @@ describe('object-mock', () => {
       expect(myObject.substring('test', 0, 2)).toBe('te');
 
       try {
-        expect(myObject.substring('test', 1, 2)).toBe('es');
+        myObject.substring('test', 1, 2);
         throw new Error('Expect fail');
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Method name mismatch: {
-            "line": "230",
+            "line": "236",
             "mockIndex": 2,
             "actual": "substring",
             "expect": "uppercase"
@@ -258,12 +264,12 @@ describe('object-mock', () => {
       try {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        expect(myObject.substring('test', 0)).toBe('te');
+        myObject.substring('test', 0);
         throw new Error('Expect fail');
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameters count mismatch: {
-            "line": "256",
+            "line": "262",
             "mockIndex": 0,
             "name": "substring",
             "actual": 2,
@@ -280,6 +286,8 @@ describe('object-mock', () => {
       const myObjectMocks: ObjectMocks<MyType> = [
         { name: 'self', parameters: [], returnSelf: true },
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
+        { name: 'substring', parameters: ['test', 0, 2, { key: 'value1' }], return: 'te', strict: true },
+        { name: 'substring', parameters: ['test', 0, 2, { key: 'value1' }], return: 'te' },
       ];
 
       const myObject = createObjectMock(myObjectMocks);
@@ -287,17 +295,57 @@ describe('object-mock', () => {
       expect(myObject.self()).toBe(myObject);
 
       try {
-        expect(myObject.substring('test', 0, 3)).toBe('te');
+        myObject.substring('test', 0, 3);
         throw new Error('Expect fail');
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "285",
+            "line": "293",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 2,
             "actual": 3,
             "expect": 2
+          }]
+        `);
+      }
+
+      try {
+        myObject.substring('test', 0, 2, { key: 'value1' });
+        throw new Error('Expect fail');
+      } catch (e) {
+        expect(e).toMatchInlineSnapshot(`
+          [Error: Parameter mismatch: {
+            "line": "293",
+            "mockIndex": 1,
+            "name": "substring",
+            "parameterIndex": 3,
+            "actual": {
+              "key": "value1"
+            },
+            "expect": {
+              "key": "value1"
+            }
+          }]
+        `);
+      }
+
+      try {
+        myObject.substring('test', 0, 2, { key: 'value2' });
+        throw new Error('Expect fail');
+      } catch (e) {
+        expect(e).toMatchInlineSnapshot(`
+          [Error: Parameter mismatch: {
+            "line": "293",
+            "mockIndex": 1,
+            "name": "substring",
+            "parameterIndex": 3,
+            "actual": {
+              "key": "value2"
+            },
+            "expect": {
+              "key": "value1"
+            }
           }]
         `);
       }
