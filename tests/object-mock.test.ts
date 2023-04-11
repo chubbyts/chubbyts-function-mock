@@ -54,6 +54,19 @@ describe('object-mock', () => {
       expect(myObjectMocks.length).toBe(0);
     });
 
+    test('use mock within promise', async () => {
+      const myObjectMocks: ObjectMocks<MyType> = [{ name: 'substring', parameters: ['test', 0, 2], return: 'te' }];
+
+      const myObject = createObjectMock(myObjectMocks);
+
+      const blub = await Promise.resolve(myObject);
+
+      expect(blub.substring('test', 0, 2)).toBe('te');
+
+      // if you want to be sure, that all mocks are called
+      expect(myObjectMocks.length).toBe(0);
+    });
+
     test('mocks with interface', async () => {
       const myObjectMocks: ObjectMocks<MyInterface> = [
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
@@ -207,7 +220,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Missing mock: {
-            "line": "199",
+            "line": "212",
             "mockIndex": 2
           }]
         `);
@@ -244,7 +257,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Method name mismatch: {
-            "line": "236",
+            "line": "249",
             "mockIndex": 2,
             "actual": "substring",
             "expect": "uppercase"
@@ -269,7 +282,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameters count mismatch: {
-            "line": "262",
+            "line": "275",
             "mockIndex": 0,
             "name": "substring",
             "actual": 2,
@@ -300,7 +313,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "293",
+            "line": "306",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 2,
@@ -316,7 +329,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "293",
+            "line": "306",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 3,
@@ -336,7 +349,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "293",
+            "line": "306",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 3,

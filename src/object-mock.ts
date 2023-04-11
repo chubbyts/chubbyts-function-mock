@@ -30,6 +30,11 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
 
   const object = new Proxy({} as T, {
     get: (_, actualName) => {
+      // fake "then" for use within promise
+      if (actualName === 'then') {
+        return;
+      }
+
       // eslint-disable-next-line functional/immutable-data
       const mock = mocks.shift();
 
