@@ -98,3 +98,9 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
     return mock.return;
   };
 };
+
+export const useFunctionMock = <T extends (...parameters: Array<any>) => any>(
+  mocks: FunctionMocks<T>,
+): [(...parameters: Parameters<T>) => ReturnType<T>, FunctionMocks<T>] => {
+  return [createFunctionMock(mocks), mocks];
+};

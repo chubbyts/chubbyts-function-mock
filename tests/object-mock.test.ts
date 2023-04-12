@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 import type { ObjectMocks } from '../src/object-mock';
-import { createObjectMock } from '../src/object-mock';
+import { createObjectMock, useObjectMock } from '../src/object-mock';
 
 type MyType = {
   substring: (string: string, start: number, stop: number, context?: { [key: string]: unknown }) => string;
@@ -17,7 +17,7 @@ interface MyInterface {
 }
 
 describe('object-mock', () => {
-  describe('createFunctionMock', () => {
+  describe('createObjectMock', () => {
     test('mocks with value', async () => {
       const myObjectMocks: ObjectMocks<MyType> = [
         { name: 'type', value: 'value1' },
@@ -32,18 +32,31 @@ describe('object-mock', () => {
       // if you want to be sure, that all mocks are called
       expect(myObjectMocks.length).toBe(0);
     });
+  });
+
+  describe('useObjectMock', () => {
+    test('mocks with value', async () => {
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
+        { name: 'type', value: 'value1' },
+        { name: 'type', value: 'value2' },
+      ]);
+
+      expect(myObject.type).toBe('value1');
+      expect(myObject.type).toBe('value2');
+
+      // if you want to be sure, that all mocks are called
+      expect(myObjectUnusedMocks.length).toBe(0);
+    });
 
     test('mocks with return', async () => {
       const context = { key: 'value' };
 
-      const myObjectMocks: ObjectMocks<MyType> = [
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         { name: 'substring', parameters: ['test', 1, 2], return: 'es' },
         { name: 'substring', parameters: ['test', 2, 2, { key: 'value' }], return: 'st' },
         { name: 'substring', parameters: ['test', 2, 2, context], return: 'st', strict: true },
-      ];
-
-      const myObject = createObjectMock(myObjectMocks);
+      ]);
 
       expect(myObject.substring('test', 0, 2)).toBe('te');
       expect(myObject.substring('test', 1, 2)).toBe('es');
@@ -51,26 +64,26 @@ describe('object-mock', () => {
       expect(myObject.substring('test', 2, 2, context)).toBe('st');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('use mock within Promise.resolve', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [{ name: 'substring', parameters: ['test', 0, 2], return: 'te' }];
-
-      const myObject = createObjectMock(myObjectMocks);
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
+        { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
+      ]);
 
       const blub = await Promise.resolve(myObject);
 
       expect(blub.substring('test', 0, 2)).toBe('te');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('use mock within Promise.reject', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [{ name: 'substring', parameters: ['test', 0, 2], return: 'te' }];
-
-      const myObject = createObjectMock(myObjectMocks);
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
+        { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
+      ]);
 
       try {
         await Promise.reject(myObject);
@@ -80,46 +93,40 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('mocks with interface', async () => {
-      const myObjectMocks: ObjectMocks<MyInterface> = [
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyInterface>([
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         { name: 'substring', parameters: ['test', 1, 2], return: 'es' },
-      ];
-
-      const myObject = createObjectMock(myObjectMocks);
+      ]);
 
       expect(myObject.substring('test', 0, 2)).toBe('te');
       expect(myObject.substring('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('mocks with returnSelf', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
         { name: 'self', parameters: [], returnSelf: true },
         { name: 'self', parameters: [], returnSelf: true },
-      ];
-
-      const myObject = createObjectMock(myObjectMocks);
+      ]);
 
       expect(myObject.self()).toBe(myObject);
       expect(myObject.self()).toBe(myObject);
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('mocks with return or error', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         { name: 'substring', parameters: ['test', 1, 2], error: new Error('test') },
-      ];
-
-      const myObject = createObjectMock(myObjectMocks);
+      ]);
 
       expect(myObject.substring('test', 0, 2)).toBe('te');
 
@@ -131,11 +138,11 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('mocks with callback function', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
         {
           name: 'substring',
           callback: (string: string, start: number, stop: number): string => {
@@ -156,19 +163,17 @@ describe('object-mock', () => {
             return 'es';
           },
         },
-      ];
-
-      const myObject = createObjectMock(myObjectMocks);
+      ]);
 
       expect(myObject.substring('test', 0, 2)).toBe('te');
       expect(myObject.substring('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('mocks with return or callback function', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         {
           name: 'substring',
@@ -180,26 +185,22 @@ describe('object-mock', () => {
             return 'es';
           },
         },
-      ];
-
-      const myObject = createObjectMock(myObjectMocks);
+      ]);
 
       expect(myObject.substring('test', 0, 2)).toBe('te');
       expect(myObject.substring('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('mocks with return and different methods', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         { name: 'uppercase', parameters: ['test'], return: 'TEST' },
         { name: 'substring', parameters: ['test', 1, 2], return: 'es' },
         { name: 'uppercase', parameters: ['test'], return: 'TEST' },
-      ];
-
-      const myObject = createObjectMock(myObjectMocks);
+      ]);
 
       expect(myObject.substring('test', 0, 2)).toBe('te');
       expect(myObject.uppercase('test')).toBe('TEST');
@@ -207,11 +208,11 @@ describe('object-mock', () => {
       expect(myObject.uppercase('test')).toBe('TEST');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('to less mocks', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
         {
           name: 'substring',
           callback: (string: string, start: number, stop: number): string => {
@@ -223,9 +224,7 @@ describe('object-mock', () => {
           },
         },
         { name: 'substring', parameters: ['test', 1, 2], return: 'es' },
-      ];
-
-      const myObject = createObjectMock(myObjectMocks);
+      ]);
 
       expect(myObject.substring('test', 0, 2)).toBe('te');
       expect(myObject.substring('test', 1, 2)).toBe('es');
@@ -236,18 +235,18 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Missing mock: {
-            "line": "228",
+            "line": "215",
             "mockIndex": 2
           }]
         `);
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('method name mismatch', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
         { name: 'type', value: 'value1' },
         {
           name: 'substring',
@@ -260,9 +259,7 @@ describe('object-mock', () => {
           },
         },
         { name: 'uppercase', parameters: ['test'], return: 'TEST' },
-      ];
-
-      const myObject = createObjectMock(myObjectMocks);
+      ]);
 
       expect(myObject.type).toBe('value1');
       expect(myObject.substring('test', 0, 2)).toBe('te');
@@ -273,7 +270,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Method name mismatch: {
-            "line": "265",
+            "line": "249",
             "mockIndex": 2,
             "actual": "substring",
             "expect": "uppercase"
@@ -282,13 +279,13 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('parameters count mismatch', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [{ name: 'substring', parameters: ['test', 0, 2], return: 'te' }];
-
-      const myObject = createObjectMock(myObjectMocks);
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
+        { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
+      ]);
 
       try {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -298,7 +295,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameters count mismatch: {
-            "line": "291",
+            "line": "286",
             "mockIndex": 0,
             "name": "substring",
             "actual": 2,
@@ -308,18 +305,16 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
 
     test('parameter mismatch', async () => {
-      const myObjectMocks: ObjectMocks<MyType> = [
+      const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
         { name: 'self', parameters: [], returnSelf: true },
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         { name: 'substring', parameters: ['test', 0, 2, { key: 'value1' }], return: 'te', strict: true },
         { name: 'substring', parameters: ['test', 0, 2, { key: 'value1' }], return: 'te' },
-      ];
-
-      const myObject = createObjectMock(myObjectMocks);
+      ]);
 
       expect(myObject.self()).toBe(myObject);
 
@@ -329,7 +324,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "322",
+            "line": "312",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 2,
@@ -345,7 +340,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "322",
+            "line": "312",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 3,
@@ -365,7 +360,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "322",
+            "line": "312",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 3,
@@ -380,7 +375,7 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectUnusedMocks.length).toBe(0);
     });
   });
 });

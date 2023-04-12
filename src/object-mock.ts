@@ -30,8 +30,8 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
 
   const object = new Proxy({} as T, {
     get: (_, actualName) => {
-      // Promise.resolve / Promise.reject
-      if (actualName === 'then' || actualName === 'catch') {
+      // Promise.resolve
+      if (actualName === 'then') {
         return;
       }
 
@@ -64,7 +64,7 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
         return mock.value;
       }
 
-      return (...actualParameters: Parameters<T[keyof T]>) => {
+      return (...actualParameters: Parameters<T[keyof T]>): ReturnType<T[keyof T]> | T => {
         if ('callback' in mock) {
           mockIndex++;
 
@@ -133,4 +133,8 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
   });
 
   return object;
+};
+
+export const useObjectMock = <T extends Record<string, any>>(mocks: ObjectMocks<T>): [T, ObjectMocks<T>] => {
+  return [createObjectMock(mocks), mocks];
 };

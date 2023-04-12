@@ -21,7 +21,7 @@
 
 A function mock helper.
 
-**IMPORTANT**: "deepStrictEqual" is used for parameter comparsion, "===" if you pass `strict: true`
+**IMPORTANT**: `deepStrictEqual` is used for parameter comparsion, `===` if you pass `strict: true`
 
 ## Requirements
 
@@ -32,7 +32,7 @@ A function mock helper.
 Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-function-mock][1].
 
 ```sh
-npm i @chubbyts/chubbyts-function-mock@1.2.6
+npm i @chubbyts/chubbyts-function-mock@1.3.0
 ```
 
 ## Usage
@@ -41,13 +41,12 @@ npm i @chubbyts/chubbyts-function-mock@1.2.6
 
 ```ts
 import { expect, test } from '@jest/globals';
-import type { FunctionMocks } from '@chubbyts/chubbyts-function-mock/dist/function-mock';
-import { createFunctionMock } from '@chubbyts/chubbyts-function-mock/dist/function-mock';
+import { useFunctionMock } from '@chubbyts/chubbyts-function-mock/dist/function-mock';
 
 type MyFunction = (string: string, start: number, stop: number) => string;
 
 test('my random test', () => {
-  const myFunctionMocks: FunctionMocks<MyFunction> = [
+  const [myFunction, myFunctionUnusedMocks] = useFunctionMock<MyFunction>([
     { parameters: ['test', 0, 2], return: 'te' },
     {
       callback: (string: string, start: number, stop: number): string => {
@@ -59,9 +58,7 @@ test('my random test', () => {
       }
     },
     { parameters: ['test', 0, 2], error: new Error('test') },
-  ];
-
-  const myFunction = createFunctionMock(myFunctionMocks);
+  ]);
 
   expect(myFunction('test', 0, 2)).toBe('te');
   expect(myFunction('test', 1, 2)).toBe('es');
@@ -74,7 +71,7 @@ test('my random test', () => {
   }
 
   // if you want to be sure, that all mocks are called
-  expect(myFunctionMocks.length).toBe(0);
+  expect(myFunctionUnusedMocks.length).toBe(0);
 });
 ```
 
@@ -82,8 +79,7 @@ test('my random test', () => {
 
 ```ts
 import { expect, test } from '@jest/globals';
-import type { ObjectMocks } from '@chubbyts/chubbyts-function-mock/dist/object-mock';
-import { createObjectMock } from '@chubbyts/chubbyts-function-mock/dist/object-mock';
+import { useObjectMock } from '@chubbyts/chubbyts-function-mock/dist/object-mock';
 
 type MyType = {
   substring: (string: string, start: number, stop: number) => string;
@@ -91,7 +87,7 @@ type MyType = {
 };
 
 test('my random test', () => {
-  const MyTypeMocks: ObjectMocks<MyType> = [
+  const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
     { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
     {
       name: 'substring',
@@ -104,22 +100,20 @@ test('my random test', () => {
       }
     },
     { name: 'uppercase', parameters: ['test'], error: new Error('test') },
-  ];
+  ]);
 
-  const MyType = createObjectMock(MyTypeMocks);
-
-  expect(MyType.substring('test', 0, 2)).toBe('te');
-  expect(MyType.substring('test', 1, 2)).toBe('es');
+  expect(myObject.substring('test', 0, 2)).toBe('te');
+  expect(myObject.substring('test', 1, 2)).toBe('es');
 
   try {
-    expect(MyType.uppercase('test')).toBe('st');
+    expect(myObject.uppercase('test')).toBe('st');
     throw new Error('Expect fail');
   } catch (e) {
     expect(e).toMatchInlineSnapshot('[Error: test]');
   }
 
   // if you want to be sure, that all mocks are called
-  expect(MyTypeMocks.length).toBe(0);
+  expect(myObjectUnusedMocks.length).toBe(0);
 });
 ```
 
