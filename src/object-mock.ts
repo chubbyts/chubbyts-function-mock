@@ -30,8 +30,8 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
 
   const object = new Proxy({} as T, {
     get: (_, actualName) => {
-      // fake "then" for use within promise
-      if (actualName === 'then') {
+      // Promise.resolve / Promise.reject
+      if (actualName === 'then' || actualName === 'catch') {
         return;
       }
 
