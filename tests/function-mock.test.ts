@@ -32,7 +32,7 @@ describe('function-mock', () => {
     test('mocks with return', async () => {
       const context = { key: 'value' };
 
-      const [myFunction, myFunctionUnusedMocks] = useFunctionMock<MyFunction>([
+      const [myFunction, myFunctionMocks] = useFunctionMock<MyFunction>([
         { parameters: ['test', 0, 2], return: 'te' },
         { parameters: ['test', 1, 2], return: 'es' },
         { parameters: ['test', 2, 2, { key: 'value' }], return: 'st' },
@@ -45,11 +45,11 @@ describe('function-mock', () => {
       expect(myFunction('test', 2, 2, context)).toBe('st');
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionUnusedMocks.length).toBe(0);
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('mocks with return or error', async () => {
-      const [myFunction, myFunctionUnusedMocks] = useFunctionMock<MyFunction>([
+      const [myFunction, myFunctionMocks] = useFunctionMock<MyFunction>([
         { parameters: ['test', 0, 2], return: 'te' },
         { parameters: ['test', 1, 2], error: new Error('test') },
       ]);
@@ -64,11 +64,11 @@ describe('function-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionUnusedMocks.length).toBe(0);
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('mocks with callback function', async () => {
-      const [myFunction, myFunctionUnusedMocks] = useFunctionMock<MyFunction>([
+      const [myFunction, myFunctionMocks] = useFunctionMock<MyFunction>([
         {
           callback: (string: string, start: number, stop: number): string => {
             expect(string).toBe('test');
@@ -93,11 +93,11 @@ describe('function-mock', () => {
       expect(myFunction('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionUnusedMocks.length).toBe(0);
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('mocks with function', async () => {
-      const [myFunction, myFunctionUnusedMocks] = useFunctionMock<MyFunction>([
+      const [myFunction, myFunctionMocks] = useFunctionMock<MyFunction>([
         (string: string, start: number, stop: number): string => {
           expect(string).toBe('test');
           expect(start).toBe(0);
@@ -118,11 +118,11 @@ describe('function-mock', () => {
       expect(myFunction('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionUnusedMocks.length).toBe(0);
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('mocks with return or callback function', async () => {
-      const [myFunction, myFunctionUnusedMocks] = useFunctionMock<MyFunction>([
+      const [myFunction, myFunctionMocks] = useFunctionMock<MyFunction>([
         { parameters: ['test', 0, 2], return: 'te' },
         {
           callback: (string: string, start: number, stop: number): string => {
@@ -139,11 +139,11 @@ describe('function-mock', () => {
       expect(myFunction('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionUnusedMocks.length).toBe(0);
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('to less mocks', async () => {
-      const [myFunction, myFunctionUnusedMocks] = useFunctionMock<MyFunction>([
+      const [myFunction, myFunctionMocks] = useFunctionMock<MyFunction>([
         {
           callback: (string: string, start: number, stop: number): string => {
             expect(string).toBe('test');
@@ -180,13 +180,11 @@ describe('function-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionUnusedMocks.length).toBe(0);
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('parameters count mismatch', async () => {
-      const [myFunction, myFunctionUnusedMocks] = useFunctionMock<MyFunction>([
-        { parameters: ['test', 0, 2], return: 'te' },
-      ]);
+      const [myFunction, myFunctionMocks] = useFunctionMock<MyFunction>([{ parameters: ['test', 0, 2], return: 'te' }]);
 
       try {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -205,11 +203,11 @@ describe('function-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionUnusedMocks.length).toBe(0);
+      expect(myFunctionMocks.length).toBe(0);
     });
 
     test('parameter mismatch', async () => {
-      const [myFunction, myFunctionUnusedMocks] = useFunctionMock<MyFunction>([
+      const [myFunction, myFunctionMocks] = useFunctionMock<MyFunction>([
         { parameters: ['test', 0, 2], return: 'te' },
         { parameters: ['test', 0, 2, { key: 'value1' }], return: 'te', strict: true },
         { parameters: ['test', 0, 2, { key: 'value1' }], return: 'te' },
@@ -221,7 +219,7 @@ describe('function-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "212",
+            "line": "210",
             "mockIndex": 0,
             "parameterIndex": 2,
             "actual": 3,
@@ -236,7 +234,7 @@ describe('function-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "212",
+            "line": "210",
             "mockIndex": 0,
             "parameterIndex": 3,
             "actual": {
@@ -255,7 +253,7 @@ describe('function-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "212",
+            "line": "210",
             "mockIndex": 0,
             "parameterIndex": 3,
             "actual": {
@@ -269,7 +267,7 @@ describe('function-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionUnusedMocks.length).toBe(0);
+      expect(myFunctionMocks.length).toBe(0);
     });
   });
 });

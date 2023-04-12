@@ -32,7 +32,7 @@ A function mock helper.
 Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-function-mock][1].
 
 ```sh
-npm i @chubbyts/chubbyts-function-mock@1.3.0
+npm i @chubbyts/chubbyts-function-mock@1.3.1
 ```
 
 ## Usage
@@ -46,7 +46,7 @@ import { useFunctionMock } from '@chubbyts/chubbyts-function-mock/dist/function-
 type MyFunction = (string: string, start: number, stop: number) => string;
 
 test('my random test', () => {
-  const [myFunction, myFunctionUnusedMocks] = useFunctionMock<MyFunction>([
+  const [myFunction, myFunctionMocks] = useFunctionMock<MyFunction>([
     { parameters: ['test', 0, 2], return: 'te' },
     {
       callback: (string: string, start: number, stop: number): string => {
@@ -71,7 +71,7 @@ test('my random test', () => {
   }
 
   // if you want to be sure, that all mocks are called
-  expect(myFunctionUnusedMocks.length).toBe(0);
+  expect(myFunctionMocks.length).toBe(0);
 });
 ```
 
@@ -87,7 +87,7 @@ type MyType = {
 };
 
 test('my random test', () => {
-  const [myObject, myObjectUnusedMocks] = useObjectMock<MyType>([
+  const [myObject, myObjectMocks] = useObjectMock<MyType>([
     { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
     {
       name: 'substring',
@@ -113,7 +113,7 @@ test('my random test', () => {
   }
 
   // if you want to be sure, that all mocks are called
-  expect(myObjectUnusedMocks.length).toBe(0);
+  expect(myObjectMocks.length).toBe(0);
 });
 ```
 
