@@ -3,13 +3,15 @@ name: CI
 on:
   push:
   pull_request:
+    branches:
+      - master
   schedule:
     - cron: '0 0 * * *'
 
 jobs:
   node16:
     name: Node 16
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -21,7 +23,7 @@ jobs:
       - run: npm test
   node18:
     name: Node 18
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: checkout
         uses: actions/checkout@v3
