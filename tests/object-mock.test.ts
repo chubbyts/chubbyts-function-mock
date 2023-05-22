@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 import type { ObjectMocks } from '../src/object-mock';
-import { createObjectMock, useObjectMock } from '../src/object-mock';
+import { internalResolveCallerLineFromStack, createObjectMock, useObjectMock } from '../src/object-mock';
 
 type MyType = {
   substring: (string: string, start: number, stop: number, context?: { [key: string]: unknown }) => string;
@@ -376,6 +376,58 @@ describe('object-mock', () => {
 
       // if you want to be sure, that all mocks are called
       expect(myObjectMocks.length).toBe(0);
+    });
+  });
+
+  describe('internalResolveCallerLineFromStack', () => {
+    test('with no stack', () => {
+      expect(internalResolveCallerLineFromStack(undefined)).toBeUndefined();
+    });
+
+    test('with useObjectMock', () => {
+      expect(
+        internalResolveCallerLineFromStack(`
+      Error:
+        at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:19:45)
+        at useObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:107:42)
+        at Object.useObjectMock (/path/to/project/tests/unit/sample.test.ts:8:35)
+        ...
+      `),
+      ).toBe('8');
+    });
+
+    test('with createObjectMock', () => {
+      expect(
+        internalResolveCallerLineFromStack(`
+      Error:
+        at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:19:45)
+        at Object.createObjectMock (/path/to/project/tests/unit/sample.test.ts:8:35)
+        ...
+      `),
+      ).toBe('8');
+    });
+
+    test('with anonymous', () => {
+      expect(
+        internalResolveCallerLineFromStack(`
+      Error:
+        at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:19:45)
+        at useObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:107:42)
+        at Object.<anonymous> (/path/to/project/tests/unit/sample.test.ts:8:35)
+        ...
+      `),
+      ).toBe('8');
+    });
+
+    test('with no match', () => {
+      expect(
+        internalResolveCallerLineFromStack(`
+      Error:
+        at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:19:45)
+        at useObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:107:42)
+        ...
+      `),
+      ).toBeUndefined();
     });
   });
 });

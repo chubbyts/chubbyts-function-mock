@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 import type { FunctionMocks } from '../src/function-mock';
-import { createFunctionMock, useFunctionMock } from '../src/function-mock';
+import { internalResolveCallerLineFromStack, createFunctionMock, useFunctionMock } from '../src/function-mock';
 
 type MyFunction = (string: string, start: number, stop: number, context?: { [key: string]: unknown }) => string;
 
@@ -268,6 +268,58 @@ describe('function-mock', () => {
 
       // if you want to be sure, that all mocks are called
       expect(myFunctionMocks.length).toBe(0);
+    });
+  });
+
+  describe('internalResolveCallerLineFromStack', () => {
+    test('with no stack', () => {
+      expect(internalResolveCallerLineFromStack(undefined)).toBeUndefined();
+    });
+
+    test('with useFunctionMock', () => {
+      expect(
+        internalResolveCallerLineFromStack(`
+      Error:
+        at createFunctionMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/function-mock.js:19:45)
+        at useFunctionMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/function-mock.js:107:42)
+        at Object.useFunctionMock (/path/to/project/tests/unit/sample.test.ts:8:35)
+        ...
+      `),
+      ).toBe('8');
+    });
+
+    test('with createFunctionMock', () => {
+      expect(
+        internalResolveCallerLineFromStack(`
+      Error:
+        at createFunctionMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/function-mock.js:19:45)
+        at Object.createFunctionMock (/path/to/project/tests/unit/sample.test.ts:8:35)
+        ...
+      `),
+      ).toBe('8');
+    });
+
+    test('with anonymous', () => {
+      expect(
+        internalResolveCallerLineFromStack(`
+      Error:
+        at createFunctionMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/function-mock.js:19:45)
+        at useFunctionMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/function-mock.js:107:42)
+        at Object.<anonymous> (/path/to/project/tests/unit/sample.test.ts:8:35)
+        ...
+      `),
+      ).toBe('8');
+    });
+
+    test('with no match', () => {
+      expect(
+        internalResolveCallerLineFromStack(`
+      Error:
+        at createFunctionMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/function-mock.js:19:45)
+        at useFunctionMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/function-mock.js:107:42)
+        ...
+      `),
+      ).toBeUndefined();
     });
   });
 });

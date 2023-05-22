@@ -4,7 +4,7 @@ import { deepStrictEqual } from 'assert';
 
 const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context, null, 2);
 
-const resolveCallerLineFromStack = (stack?: string): number | undefined => {
+export const internalResolveCallerLineFromStack = (stack?: string): string | undefined => {
   if (!stack) {
     return undefined;
   }
@@ -12,7 +12,7 @@ const resolveCallerLineFromStack = (stack?: string): number | undefined => {
   const callerMatch = stack.match(/Object.(useObjectMock|createObjectMock|<anonymous>) \(([^)]+)\)/);
 
   if (callerMatch) {
-    return callerMatch[2].split(':')[1] as unknown as number;
+    return callerMatch[2].split(':')[1];
   }
 
   return undefined;
@@ -35,7 +35,7 @@ export type ObjectMocks<T extends Record<string, any>> = Array<
 >;
 
 export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMocks<T>): T => {
-  const line = resolveCallerLineFromStack(new Error().stack);
+  const line = internalResolveCallerLineFromStack(new Error().stack);
 
   // eslint-disable-next-line functional/no-let
   let mockIndex = 0;
