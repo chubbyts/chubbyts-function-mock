@@ -4,6 +4,20 @@ import { deepStrictEqual } from 'assert';
 
 const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context, null, 2);
 
+const resolveCallerLineFromStack = (stack?: string): number | undefined => {
+  if (!stack) {
+    return undefined;
+  }
+
+  const callerMatch = stack.match(/Object.(useFunctionMock|createFunctionMock|<anonymous>) \(([^)]+)\)/);
+
+  if (callerMatch) {
+    return callerMatch[2].split(':')[1] as unknown as number;
+  }
+
+  return undefined;
+};
+
 export type FunctionMocks<T extends (...parameters: Array<any>) => any> = Array<
   | { parameters: Parameters<T>; return: ReturnType<T>; strict?: true }
   | { parameters: Parameters<T>; error: Error; strict?: true }
@@ -14,9 +28,7 @@ export type FunctionMocks<T extends (...parameters: Array<any>) => any> = Array<
 export const createFunctionMock = <T extends (...parameters: Array<any>) => any>(
   mocks: FunctionMocks<T>,
 ): ((...parameters: Parameters<T>) => ReturnType<T>) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const [_, line] = new Error().stack.match(/Object.<anonymous> \(([^)]+)\)/)[1].split(':');
+  const line = resolveCallerLineFromStack(new Error().stack);
 
   // eslint-disable-next-line functional/no-let
   let mockIndex = 0;

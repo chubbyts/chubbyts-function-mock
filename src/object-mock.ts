@@ -4,6 +4,20 @@ import { deepStrictEqual } from 'assert';
 
 const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context, null, 2);
 
+const resolveCallerLineFromStack = (stack?: string): number | undefined => {
+  if (!stack) {
+    return undefined;
+  }
+
+  const callerMatch = stack.match(/Object.(useObjectMock|createObjectMock|<anonymous>) \(([^)]+)\)/);
+
+  if (callerMatch) {
+    return callerMatch[2].split(':')[1] as unknown as number;
+  }
+
+  return undefined;
+};
+
 export type ObjectMocks<T extends Record<string, any>> = Array<
   {
     [K in keyof T]: T[K] extends (...parameters: Array<any>) => any
@@ -21,9 +35,7 @@ export type ObjectMocks<T extends Record<string, any>> = Array<
 >;
 
 export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMocks<T>): T => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const [_, line] = new Error().stack.match(/Object.<anonymous> \(([^)]+)\)/)[1].split(':');
+  const line = resolveCallerLineFromStack(new Error().stack);
 
   // eslint-disable-next-line functional/no-let
   let mockIndex = 0;
