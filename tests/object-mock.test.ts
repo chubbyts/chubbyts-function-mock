@@ -1,9 +1,6 @@
-import { readFileSync } from 'fs';
 import { describe, expect, test } from '@jest/globals';
 import type { ObjectMocks } from '../src/object-mock';
 import { internalResolveCallerLineFromStack, createObjectMock, useObjectMock } from '../src/object-mock';
-
-const isStryker = readFileSync(__filename, 'utf-8').split('\n')[0] === '// @ts-nocheck';
 
 type MyType = {
   substring: (string: string, start: number, stop: number, context?: { [key: string]: unknown }) => string;
@@ -236,21 +233,12 @@ describe('object-mock', () => {
         myObject.substring('test', 2, 2);
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Missing mock: {
-            "line": "219",
+            "line": "215",
             "mockIndex": 2
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Missing mock: {
-            "line": "218",
-            "mockIndex": 2
-          }]
-        `);
-        }
       }
 
       // if you want to be sure, that all mocks are called
@@ -280,25 +268,14 @@ describe('object-mock', () => {
         myObject.substring('test', 1, 2);
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Method name mismatch: {
-            "line": "262",
+            "line": "249",
             "mockIndex": 2,
             "actual": "substring",
             "expect": "uppercase"
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Method name mismatch: {
-            "line": "261",
-            "mockIndex": 2,
-            "actual": "substring",
-            "expect": "uppercase"
-          }]
-        `);
-        }
       }
 
       // if you want to be sure, that all mocks are called
@@ -316,27 +293,15 @@ describe('object-mock', () => {
         myObject.substring('test', 0);
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Parameters count mismatch: {
-            "line": "310",
+            "line": "286",
             "mockIndex": 0,
             "name": "substring",
             "actual": 2,
             "expect": 3
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Parameters count mismatch: {
-            "line": "309",
-            "mockIndex": 0,
-            "name": "substring",
-            "actual": 2,
-            "expect": 3
-          }]
-        `);
-        }
       }
 
       // if you want to be sure, that all mocks are called
@@ -357,10 +322,9 @@ describe('object-mock', () => {
         myObject.substring('test', 0, 3);
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "348",
+            "line": "312",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 2,
@@ -368,28 +332,15 @@ describe('object-mock', () => {
             "expect": 2
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Parameter mismatch: {
-            "line": "347",
-            "mockIndex": 1,
-            "name": "substring",
-            "parameterIndex": 2,
-            "actual": 3,
-            "expect": 2
-          }]
-        `);
-        }
       }
 
       try {
         myObject.substring('test', 0, 2, { key: 'value1' });
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "348",
+            "line": "312",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 3,
@@ -401,32 +352,15 @@ describe('object-mock', () => {
             }
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Parameter mismatch: {
-            "line": "347",
-            "mockIndex": 1,
-            "name": "substring",
-            "parameterIndex": 3,
-            "actual": {
-              "key": "value1"
-            },
-            "expect": {
-              "key": "value1"
-            }
-          }]
-        `);
-        }
       }
 
       try {
         myObject.substring('test', 0, 2, { key: 'value2' });
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "348",
+            "line": "312",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 3,
@@ -438,22 +372,6 @@ describe('object-mock', () => {
             }
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Parameter mismatch: {
-            "line": "347",
-            "mockIndex": 1,
-            "name": "substring",
-            "parameterIndex": 3,
-            "actual": {
-              "key": "value2"
-            },
-            "expect": {
-              "key": "value1"
-            }
-          }]
-        `);
-        }
       }
 
       // if you want to be sure, that all mocks are called

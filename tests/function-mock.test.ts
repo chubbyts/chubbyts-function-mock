@@ -1,9 +1,6 @@
-import { readFileSync } from 'fs';
 import { describe, expect, test } from '@jest/globals';
 import type { FunctionMocks } from '../src/function-mock';
 import { internalResolveCallerLineFromStack, createFunctionMock, useFunctionMock } from '../src/function-mock';
-
-const isStryker = readFileSync(__filename, 'utf-8').split('\n')[0] === '// @ts-nocheck';
 
 type MyFunction = (string: string, start: number, stop: number, context?: { [key: string]: unknown }) => string;
 
@@ -174,21 +171,12 @@ describe('function-mock', () => {
         myFunction('test', 3, 1);
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Missing mock: {
-            "line": "150",
+            "line": "146",
             "mockIndex": 3
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Missing mock: {
-            "line": "149",
-            "mockIndex": 3
-          }]
-        `);
-        }
       }
 
       // if you want to be sure, that all mocks are called
@@ -204,25 +192,14 @@ describe('function-mock', () => {
         myFunction('test', 0);
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Parameters count mismatch: {
-            "line": "200",
+            "line": "187",
             "mockIndex": 0,
             "actual": 2,
             "expect": 3
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Parameters count mismatch: {
-            "line": "199",
-            "mockIndex": 0,
-            "actual": 2,
-            "expect": 3
-          }]
-        `);
-        }
       }
 
       // if you want to be sure, that all mocks are called
@@ -240,37 +217,24 @@ describe('function-mock', () => {
         myFunction('test', 0, 3);
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "234",
+            "line": "210",
             "mockIndex": 0,
             "parameterIndex": 2,
             "actual": 3,
             "expect": 2
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Parameter mismatch: {
-            "line": "233",
-            "mockIndex": 0,
-            "parameterIndex": 2,
-            "actual": 3,
-            "expect": 2
-          }]
-        `);
-        }
       }
 
       try {
         expect(myFunction('test', 0, 2, { key: 'value1' })).toBe('te');
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "234",
+            "line": "210",
             "mockIndex": 0,
             "parameterIndex": 3,
             "actual": {
@@ -281,31 +245,15 @@ describe('function-mock', () => {
             }
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Parameter mismatch: {
-            "line": "233",
-            "mockIndex": 0,
-            "parameterIndex": 3,
-            "actual": {
-              "key": "value1"
-            },
-            "expect": {
-              "key": "value1"
-            }
-          }]
-        `);
-        }
       }
 
       try {
         expect(myFunction('test', 0, 2, { key: 'value2' })).toBe('te');
         throw new Error('Expect fail');
       } catch (e) {
-        if (isStryker) {
-          expect(e).toMatchInlineSnapshot(`
+        expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "234",
+            "line": "210",
             "mockIndex": 0,
             "parameterIndex": 3,
             "actual": {
@@ -316,21 +264,6 @@ describe('function-mock', () => {
             }
           }]
         `);
-        } else {
-          expect(e).toMatchInlineSnapshot(`
-          [Error: Parameter mismatch: {
-            "line": "233",
-            "mockIndex": 0,
-            "parameterIndex": 3,
-            "actual": {
-              "key": "value2"
-            },
-            "expect": {
-              "key": "value1"
-            }
-          }]
-        `);
-        }
       }
 
       // if you want to be sure, that all mocks are called
