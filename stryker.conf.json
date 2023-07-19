@@ -6,5 +6,6 @@
     "clear-text",
     "progress",
     "dashboard"
-  ]
+  ],
+  "disableTypeChecks": "src/**/*.{js,ts}"
 }
