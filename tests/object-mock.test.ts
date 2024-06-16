@@ -5,6 +5,7 @@ import { internalResolveCallerLineFromStack, createObjectMock, useObjectMock } f
 type MyType = {
   substring: (string: string, start: number, stop: number, context?: { [key: string]: unknown }) => string;
   uppercase: (string: string) => string;
+  doesNothing: () => void;
   self: () => MyType;
   type: string;
 };
@@ -12,6 +13,7 @@ type MyType = {
 interface MyInterface {
   substring: (string: string, start: number, stop: number, context?: { [key: string]: unknown }) => string;
   uppercase: (string: string) => string;
+  doesNothing: () => void;
   self: () => MyType;
   type: string;
 }
@@ -198,14 +200,18 @@ describe('object-mock', () => {
       const [myObject, myObjectMocks] = useObjectMock<MyType>([
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
         { name: 'uppercase', parameters: ['test'], return: 'TEST' },
+        { name: 'doesNothing', parameters: [] },
         { name: 'substring', parameters: ['test', 1, 2], return: 'es' },
         { name: 'uppercase', parameters: ['test'], return: 'TEST' },
+        { name: 'doesNothing', parameters: [] },
       ]);
 
       expect(myObject.substring('test', 0, 2)).toBe('te');
       expect(myObject.uppercase('test')).toBe('TEST');
+      myObject.doesNothing();
       expect(myObject.substring('test', 1, 2)).toBe('es');
       expect(myObject.uppercase('test')).toBe('TEST');
+      myObject.doesNothing();
 
       // if you want to be sure, that all mocks are called
       expect(myObjectMocks.length).toBe(0);
@@ -235,7 +241,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Missing mock: {
-            "line": "215",
+            "line": "221",
             "mockIndex": 2
           }]
         `);
@@ -270,7 +276,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Method name mismatch: {
-            "line": "249",
+            "line": "255",
             "mockIndex": 2,
             "actual": "substring",
             "expect": "uppercase"
@@ -295,7 +301,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameters count mismatch: {
-            "line": "286",
+            "line": "292",
             "mockIndex": 0,
             "name": "substring",
             "actual": 2,
@@ -324,7 +330,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "312",
+            "line": "318",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 2,
@@ -340,7 +346,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "312",
+            "line": "318",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 3,
@@ -360,7 +366,7 @@ describe('object-mock', () => {
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`
           [Error: Parameter mismatch: {
-            "line": "312",
+            "line": "318",
             "mockIndex": 1,
             "name": "substring",
             "parameterIndex": 3,

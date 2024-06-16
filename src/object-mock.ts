@@ -27,7 +27,9 @@ export type ObjectMocks<T extends Record<string, any>> = Array<
             | { name: K; parameters: Parameters<T[K]>; error: Error; strict?: true }
             | { name: K; callback: T[K] }
         :
-            | { name: K; parameters: Parameters<T[K]>; return: ReturnType<T[K]>; strict?: true }
+            | (ReturnType<T[K]> extends void
+                ? { name: K; parameters: Parameters<T[K]>; strict?: true }
+                : { name: K; parameters: Parameters<T[K]>; return: ReturnType<T[K]>; strict?: true })
             | { name: K; parameters: Parameters<T[K]>; error: Error; strict?: true }
             | { name: K; callback: T[K] }
       : { name: K; value: T[K] };
@@ -76,7 +78,7 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
         return mock.value;
       }
 
-      return (...actualParameters: Parameters<T[keyof T]>): ReturnType<T[keyof T]> | T => {
+      return (...actualParameters: Parameters<T[keyof T]>): ReturnType<T[keyof T]> | T | void => {
         if ('callback' in mock) {
           mockIndex++;
 
@@ -139,7 +141,9 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
           return object;
         }
 
-        return mock.return;
+        if ('return' in mock) {
+          return mock.return;
+        }
       };
     },
   });
