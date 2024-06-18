@@ -2,24 +2,32 @@
 
 import { deepStrictEqual } from 'assert';
 
-const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context, null, 2);
+const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context);
 
-export const internalResolveCallerLineFromStack = (stack?: string): string | undefined => {
+export const internalResolveCallerLineFromStack = (stack?: string): number | undefined => {
   if (!stack) {
     return undefined;
   }
 
-  const callerMatch = stack.match(/Object.(useFunctionMock|createFunctionMock|<anonymous>) \(([^)]+)\)/);
+  const stackLines = stack.split('\n');
 
-  if (callerMatch) {
-    return callerMatch[2].split(':')[1];
+  for (const stackLine of stackLines) {
+    if (-1 === stackLine.search(/at /)) {
+      continue;
+    }
+
+    if (-1 === stackLine.search(/function-mock\.(cjs|js|mjs|ts)/)) {
+      return parseInt(stackLine.split(':')[1]);
+    }
   }
 
   return undefined;
 };
 
 export type FunctionMocks<T extends (...parameters: Array<any>) => any> = Array<
-  | { parameters: Parameters<T>; return: ReturnType<T>; strict?: true }
+  | (ReturnType<T> extends void
+      ? { parameters: Parameters<T>; strict?: true }
+      : { parameters: Parameters<T>; return: ReturnType<T>; strict?: true })
   | { parameters: Parameters<T>; error: Error; strict?: true }
   | { callback: T }
   | T
@@ -33,7 +41,7 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
   // eslint-disable-next-line functional/no-let
   let mockIndex = 0;
 
-  return (...actualParameters: Parameters<T>): ReturnType<T> => {
+  return (...actualParameters: Parameters<T>) => {
     // eslint-disable-next-line functional/immutable-data
     const mock = mocks.shift();
 
@@ -81,6 +89,7 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
               parameterIndex,
               actual,
               expect,
+              strict: true,
             })}`,
           );
         }
@@ -107,7 +116,9 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
       throw mock.error;
     }
 
-    return mock.return;
+    if ('return' in mock) {
+      return mock.return;
+    }
   };
 };
 

@@ -32,7 +32,7 @@ A function mock helper.
 Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-function-mock][1].
 
 ```sh
-npm i @chubbyts/chubbyts-function-mock@1.4.1
+npm i @chubbyts/chubbyts-function-mock@1.4.3
 ```
 
 ## Usage
@@ -40,7 +40,7 @@ npm i @chubbyts/chubbyts-function-mock@1.4.1
 ### createFunctionMock
 
 ```ts
-import { expect, test } from '@jest/globals';
+import { expect, test } from '@jest/globals'; // or 'vitest'
 import { useFunctionMock } from '@chubbyts/chubbyts-function-mock/dist/function-mock';
 
 type MyFunction = (string: string, start: number, stop: number) => string;
@@ -80,7 +80,7 @@ test('my random test', () => {
 **IMPORTANT**: Do not use with spread operator `...myObject`!.
 
 ```ts
-import { expect, test } from '@jest/globals';
+import { expect, test } from '@jest/globals'; // or 'vitest'
 import { useObjectMock } from '@chubbyts/chubbyts-function-mock/dist/object-mock';
 
 type MyType = {

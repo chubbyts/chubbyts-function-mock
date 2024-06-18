@@ -2,22 +2,27 @@
 
 import { deepStrictEqual } from 'assert';
 
-const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context, null, 2);
+const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context);
 
-export const internalResolveCallerLineFromStack = (stack?: string): string | undefined => {
+export const internalResolveCallerLineFromStack = (stack?: string): number | undefined => {
   if (!stack) {
     return undefined;
   }
 
-  const callerMatch = stack.match(/Object.(useObjectMock|createObjectMock|<anonymous>) \(([^)]+)\)/);
+  const stackLines = stack.split('\n');
 
-  if (callerMatch) {
-    return callerMatch[2].split(':')[1];
+  for (const stackLine of stackLines) {
+    if (-1 === stackLine.search(/at /)) {
+      continue;
+    }
+
+    if (-1 === stackLine.search(/object-mock\.(cjs|js|mjs|ts)/)) {
+      return parseInt(stackLine.split(':')[1]);
+    }
   }
 
   return undefined;
 };
-
 export type ObjectMocks<T extends Record<string, any>> = Array<
   {
     [K in keyof T]: T[K] extends (...parameters: Array<any>) => any
@@ -78,7 +83,7 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
         return mock.value;
       }
 
-      return (...actualParameters: Parameters<T[keyof T]>): ReturnType<T[keyof T]> | T | void => {
+      return (...actualParameters: Parameters<T[keyof T]>) => {
         if ('callback' in mock) {
           mockIndex++;
 
@@ -110,6 +115,7 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
                   parameterIndex,
                   actual,
                   expect,
+                  strict: true,
                 })}`,
               );
             }

@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test } from 'vitest';
 import type { ObjectMocks } from '../src/object-mock';
 import { internalResolveCallerLineFromStack, createObjectMock, useObjectMock } from '../src/object-mock';
 
@@ -125,9 +125,11 @@ describe('object-mock', () => {
     });
 
     test('mocks with return or error', async () => {
+      const error = new Error('test');
+
       const [myObject, myObjectMocks] = useObjectMock<MyType>([
         { name: 'substring', parameters: ['test', 0, 2], return: 'te' },
-        { name: 'substring', parameters: ['test', 1, 2], error: new Error('test') },
+        { name: 'substring', parameters: ['test', 1, 2], error },
       ]);
 
       expect(myObject.substring('test', 0, 2)).toBe('te');
@@ -136,7 +138,7 @@ describe('object-mock', () => {
         expect(myObject.substring('test', 1, 2)).toBe('es');
         throw new Error('Expect fail');
       } catch (e) {
-        expect(e).toMatchInlineSnapshot('[Error: test]');
+        expect(e).toBe(error);
       }
 
       // if you want to be sure, that all mocks are called
@@ -239,12 +241,7 @@ describe('object-mock', () => {
         myObject.substring('test', 2, 2);
         throw new Error('Expect fail');
       } catch (e) {
-        expect(e).toMatchInlineSnapshot(`
-          [Error: Missing mock: {
-            "line": "221",
-            "mockIndex": 2
-          }]
-        `);
+        expect(e.message).toMatch(/Missing mock: {"line":\d+,"mockIndex":2}/);
       }
 
       // if you want to be sure, that all mocks are called
@@ -274,14 +271,9 @@ describe('object-mock', () => {
         myObject.substring('test', 1, 2);
         throw new Error('Expect fail');
       } catch (e) {
-        expect(e).toMatchInlineSnapshot(`
-          [Error: Method name mismatch: {
-            "line": "255",
-            "mockIndex": 2,
-            "actual": "substring",
-            "expect": "uppercase"
-          }]
-        `);
+        expect(e.message).toMatch(
+          /Method name mismatch: {"line":\d+,"mockIndex":2,"actual":"substring","expect":"uppercase"}/,
+        );
       }
 
       // if you want to be sure, that all mocks are called
@@ -299,15 +291,9 @@ describe('object-mock', () => {
         myObject.substring('test', 0);
         throw new Error('Expect fail');
       } catch (e) {
-        expect(e).toMatchInlineSnapshot(`
-          [Error: Parameters count mismatch: {
-            "line": "292",
-            "mockIndex": 0,
-            "name": "substring",
-            "actual": 2,
-            "expect": 3
-          }]
-        `);
+        expect(e.message).toMatch(
+          /Parameters count mismatch: {"line":\d+,"mockIndex":0,"name":"substring","actual":2,"expect":3}/,
+        );
       }
 
       // if you want to be sure, that all mocks are called
@@ -328,56 +314,27 @@ describe('object-mock', () => {
         myObject.substring('test', 0, 3);
         throw new Error('Expect fail');
       } catch (e) {
-        expect(e).toMatchInlineSnapshot(`
-          [Error: Parameter mismatch: {
-            "line": "318",
-            "mockIndex": 1,
-            "name": "substring",
-            "parameterIndex": 2,
-            "actual": 3,
-            "expect": 2
-          }]
-        `);
+        expect(e.message).toMatch(
+          /Parameter mismatch: {"line":\d+,"mockIndex":1,"name":"substring","parameterIndex":2,"actual":3,"expect":2}/,
+        );
       }
 
       try {
         myObject.substring('test', 0, 2, { key: 'value1' });
         throw new Error('Expect fail');
       } catch (e) {
-        expect(e).toMatchInlineSnapshot(`
-          [Error: Parameter mismatch: {
-            "line": "318",
-            "mockIndex": 1,
-            "name": "substring",
-            "parameterIndex": 3,
-            "actual": {
-              "key": "value1"
-            },
-            "expect": {
-              "key": "value1"
-            }
-          }]
-        `);
+        expect(e.message).toMatch(
+          /Parameter mismatch: {"line":\d+,"mockIndex":1,"name":"substring","parameterIndex":3,"actual":{"key":"value1"},"expect":{"key":"value1"},"strict":true}/,
+        );
       }
 
       try {
         myObject.substring('test', 0, 2, { key: 'value2' });
         throw new Error('Expect fail');
       } catch (e) {
-        expect(e).toMatchInlineSnapshot(`
-          [Error: Parameter mismatch: {
-            "line": "318",
-            "mockIndex": 1,
-            "name": "substring",
-            "parameterIndex": 3,
-            "actual": {
-              "key": "value2"
-            },
-            "expect": {
-              "key": "value1"
-            }
-          }]
-        `);
+        expect(e.message).toMatch(
+          /Parameter mismatch: {"line":\d+,"mockIndex":1,"name":"substring","parameterIndex":3,"actual":{"key":"value2"},"expect":{"key":"value1"}}/,
+        );
       }
 
       // if you want to be sure, that all mocks are called
@@ -390,47 +347,76 @@ describe('object-mock', () => {
       expect(internalResolveCallerLineFromStack(undefined)).toBeUndefined();
     });
 
-    test('with useObjectMock', () => {
-      expect(
-        internalResolveCallerLineFromStack(`
-      Error:
-        at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:19:45)
-        at useObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:107:42)
-        at Object.useObjectMock (/path/to/project/tests/unit/sample.test.ts:8:35)
-        ...
-      `),
-      ).toBe('8');
+    describe('jest like', () => {
+      test('with useObjectMock', () => {
+        expect(
+          internalResolveCallerLineFromStack(`
+        Error:
+          at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/object-mock.js:19:45)
+          at useObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/object-mock.js:107:42)
+          at Object.useObjectMock (/path/to/project/tests/unit/sample.test.ts:8:35)
+          ...
+        `),
+        ).toBe(8);
+      });
+
+      test('with createObjectMock', () => {
+        expect(
+          internalResolveCallerLineFromStack(`
+        Error:
+          at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/object-mock.js:19:45)
+          at Object.createObjectMock (/path/to/project/tests/unit/sample.test.ts:8:35)
+          ...
+        `),
+        ).toBe(8);
+      });
+
+      test('with anonymous', () => {
+        expect(
+          internalResolveCallerLineFromStack(`
+        Error:
+          at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/object-mock.js:19:45)
+          at useObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/object-mock.js:107:42)
+          at Object.<anonymous> (/path/to/project/tests/unit/sample.test.ts:8:35)
+          ...
+        `),
+        ).toBe(8);
+      });
     });
 
-    test('with createObjectMock', () => {
-      expect(
-        internalResolveCallerLineFromStack(`
-      Error:
-        at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:19:45)
-        at Object.createObjectMock (/path/to/project/tests/unit/sample.test.ts:8:35)
-        ...
-      `),
-      ).toBe('8');
-    });
+    describe('vitest like', () => {
+      test('with useObjectMock', () => {
+        expect(
+          internalResolveCallerLineFromStack(`
+        Error:
+            at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/object-mock.ts:39:51)
+            at Module.useObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/object-mock.ts:125:11)
+            at /path/to/project/tests/function-mock.test.ts:8:35
+            at file:///path/to/project/node_modules/@vitest/runner/dist/index.js:135:14
+          ...
+        `),
+        ).toBe(8);
+      });
 
-    test('with anonymous', () => {
-      expect(
-        internalResolveCallerLineFromStack(`
-      Error:
-        at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:19:45)
-        at useObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:107:42)
-        at Object.<anonymous> (/path/to/project/tests/unit/sample.test.ts:8:35)
-        ...
-      `),
-      ).toBe('8');
+      test('with createObjectMock', () => {
+        expect(
+          internalResolveCallerLineFromStack(`
+        Error:
+            at Module.createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/object-mock.ts:39:51)
+            at /path/to/project/tests/function-mock.test.ts:8:35
+            at file:///path/to/project/node_modules/@vitest/runner/dist/index.js:135:14
+          ...
+        `),
+        ).toBe(8);
+      });
     });
 
     test('with no match', () => {
       expect(
         internalResolveCallerLineFromStack(`
       Error:
-        at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:19:45)
-        at useObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-object-mock/dist/object-mock.js:107:42)
+        at createObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/object-mock.js:19:45)
+        at useObjectMock (/path/to/project/node_modules/@chubbyts/chubbyts-function-mock/dist/object-mock.js:107:42)
         ...
       `),
       ).toBeUndefined();
