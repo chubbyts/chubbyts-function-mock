@@ -1,7 +1,7 @@
 {
   "name": "@chubbyts/chubbyts-function-mock",
   "type": "module",
-  "version": "1.4.3",
+  "version": "1.5.1",
   "description": "A function mock helper.",
   "keywords": [
     "chubbyts",
@@ -13,11 +13,11 @@
   "license": "MIT",
   "repository": "chubbyts/chubbyts-function-mock",
   "scripts": {
-    "build": "node ./build.js",
+    "build": "node ./build.mjs",
     "cs-fix": "prettier --write src tests",
     "cs": "prettier --check src tests",
     "infection": "stryker run",
-    "lint-fix": "eslint src tests --fix",
+    "lint-fix": "eslint src tests eslint.config.mjs vitest.config.ts --fix",
     "lint": "eslint src tests",
     "prepare": "npm run build",
     "test": "vitest"
@@ -40,19 +40,19 @@
     }
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "dependencies": {},
   "devDependencies": {
-    "@chubbyts/chubbyts-eslint": "^2.0.7",
-    "@chubbyts/chubbyts-packaging": "^2.0.7",
-    "@stryker-mutator/core": "^8.2.6",
-    "@stryker-mutator/vitest-runner": "^8.2.6",
-    "@types/node": "^20.14.5",
-    "@vitest/coverage-v8": "^1.6.0",
-    "prettier": "^3.3.2",
-    "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "@chubbyts/chubbyts-eslint": "^3.0.1",
+    "@chubbyts/chubbyts-packaging": "^3.0.0",
+    "@stryker-mutator/core": "^8.7.1",
+    "@stryker-mutator/vitest-runner": "^8.7.1",
+    "@types/node": "^22.10.3",
+    "@vitest/coverage-v8": "^2.1.8",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
   },
   "publishConfig": {
     "access": "public"
