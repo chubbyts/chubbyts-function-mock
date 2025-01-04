@@ -1,7 +1,7 @@
 {
   "name": "@chubbyts/chubbyts-function-mock",
   "type": "module",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "A function mock helper.",
   "keywords": [
     "chubbyts",
@@ -44,8 +44,8 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@chubbyts/chubbyts-eslint": "^3.0.1",
-    "@chubbyts/chubbyts-packaging": "^3.0.0",
+    "@chubbyts/chubbyts-eslint": "^3.0.3",
+    "@chubbyts/chubbyts-packaging": "^3.0.2",
     "@stryker-mutator/core": "^8.7.1",
     "@stryker-mutator/vitest-runner": "^8.7.1",
     "@types/node": "^22.10.3",
