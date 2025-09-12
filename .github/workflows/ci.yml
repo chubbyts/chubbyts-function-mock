@@ -44,6 +44,18 @@ jobs:
         with:
           node-version: '22'
       - run: npm install
+      - run: npm test -- --run --no-cache
+  node24:
+    name: Node 24
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: checkout node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install
       - run: npm run lint
       - run: npm run cs
       - run: npm test -- --run --coverage --no-cache
