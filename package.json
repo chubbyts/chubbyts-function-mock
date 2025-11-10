@@ -42,14 +42,14 @@
     "node": ">=18"
   },
   "devDependencies": {
-    "@chubbyts/chubbyts-eslint": "^4.0.7",
-    "@stryker-mutator/core": "^9.1.1",
-    "@stryker-mutator/vitest-runner": "^9.1.1",
-    "@types/node": "^24.3.1",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@chubbyts/chubbyts-eslint": "^4.0.10",
+    "@stryker-mutator/core": "^9.3.0",
+    "@stryker-mutator/vitest-runner": "^9.3.0",
+    "@types/node": "^24.10.0",
+    "@vitest/coverage-v8": "^4.0.8",
     "prettier": "^3.6.2",
-    "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.8"
   },
   "publishConfig": {
     "access": "public"
