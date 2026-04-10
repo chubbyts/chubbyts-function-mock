@@ -5,6 +5,7 @@
         "esModuleInterop": true,
         "module": "nodenext",
         "moduleResolution": "nodenext",
+        "rootDir": ".",
         "outDir": "dist",
         "skipLibCheck": true,
         "strict": true,
