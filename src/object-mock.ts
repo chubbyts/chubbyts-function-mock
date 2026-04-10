@@ -148,9 +148,7 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
           return object;
         }
 
-        if ('return' in mock) {
-          return mock.return;
-        }
+        return (mock as { return?: unknown }).return as ReturnType<T[keyof T]>;
       };
     },
   });

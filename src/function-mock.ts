@@ -117,9 +117,7 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
       throw mock.error;
     }
 
-    if ('return' in mock) {
-      return mock.return;
-    }
+    return (mock as { return?: ReturnType<T> }).return as ReturnType<T>;
   };
 };
 
