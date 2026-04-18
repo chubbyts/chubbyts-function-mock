@@ -1,7 +1,7 @@
 {
   "name": "@chubbyts/chubbyts-function-mock",
   "type": "module",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A function mock helper.",
   "keywords": [
     "chubbyts",
@@ -13,7 +13,7 @@
   "license": "MIT",
   "repository": "chubbyts/chubbyts-function-mock",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -Rf dist && tsc",
     "cs-fix": "prettier --write src tests",
     "cs": "prettier --check src tests",
     "infection": "stryker run",
@@ -42,13 +42,13 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@chubbyts/chubbyts-eslint": "^5.0.0",
-    "@stryker-mutator/core": "^9.6.0",
-    "@stryker-mutator/vitest-runner": "^9.6.0",
+    "@chubbyts/chubbyts-eslint": "^5.1.1",
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/vitest-runner": "^9.6.1",
     "@types/node": "^25.6.0",
     "@vitest/coverage-v8": "^4.1.4",
-    "prettier": "^3.8.2",
-    "typescript": "^6.0.2",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.4"
   },
   "publishConfig": {
