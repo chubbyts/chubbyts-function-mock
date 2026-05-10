@@ -25,14 +25,14 @@ A function mock helper.
 
 ## Requirements
 
- * node: 20
+ * node: 22
 
 ## Installation
 
 Through [NPM](https://www.npmjs.com) as [@chubbyts/chubbyts-function-mock][1].
 
 ```sh
-npm i @chubbyts/chubbyts-function-mock@2.1.1
+npm i @chubbyts/chubbyts-function-mock@2.2.0
 ```
 
 ## Usage
