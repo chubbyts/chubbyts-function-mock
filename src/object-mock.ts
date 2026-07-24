@@ -28,13 +28,13 @@ export type ObjectMocks<T extends Record<string, any>> = Array<
   {
     [K in keyof T]: T[K] extends (...parameters: Array<any>) => any
       ? ReturnType<T[K]> extends T
-        ? | { name: K; parameters: Parameters<T[K]>; returnSelf: true; strict?: true }
-          | { name: K; parameters: Parameters<T[K]>; error: Error; strict?: true }
+        ? | { name: K; parameters: Parameters<T[K]>; returnSelf: true; error?: never; strict?: true }
+          | { name: K; parameters: Parameters<T[K]>; returnSelf?: never; error: Error; strict?: true }
           | { name: K; callback: T[K] }
         : | (ReturnType<T[K]> extends void
-              ? { name: K; parameters: Parameters<T[K]>; strict?: true }
-              : { name: K; parameters: Parameters<T[K]>; return: ReturnType<T[K]>; strict?: true })
-          | { name: K; parameters: Parameters<T[K]>; error: Error; strict?: true }
+              ? { name: K; parameters: Parameters<T[K]>; return?: never; error?: never; strict?: true }
+              : { name: K; parameters: Parameters<T[K]>; return: ReturnType<T[K]>; error?: never; strict?: true })
+          | { name: K; parameters: Parameters<T[K]>; return?: never; error: Error; strict?: true }
           | { name: K; callback: T[K] }
       : { name: K; value: T[K] };
   }[keyof T]

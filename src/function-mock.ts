@@ -27,22 +27,20 @@ export const internalResolveCallerLineFromStack = (stack?: string): number | und
 
 export type FunctionMocks<T extends (...parameters: Array<any>) => any> = Array<
   | (ReturnType<T> extends void
-      ? { parameters: Parameters<T>; strict?: true }
-      : { parameters: Parameters<T>; return: ReturnType<T>; strict?: true })
-  | { parameters: Parameters<T>; error: Error; strict?: true }
+      ? { parameters: Parameters<T>; return?: never; error?: never; strict?: true }
+      : { parameters: Parameters<T>; return: ReturnType<T>; error?: never; strict?: true })
+  | { parameters: Parameters<T>; return?: never; error: Error; strict?: true }
   | { callback: T }
   | T
 >;
 
-export const createFunctionMock = <T extends (...parameters: Array<any>) => any>(
-  mocks: FunctionMocks<T>,
-): ((...parameters: Parameters<T>) => ReturnType<T>) => {
+export const createFunctionMock = <T extends (...parameters: Array<any>) => any>(mocks: FunctionMocks<T>): T => {
   const line = internalResolveCallerLineFromStack(new Error('capture stack').stack);
 
   // eslint-disable-next-line functional/no-let
   let mockIndex = 0;
 
-  return (...actualParameters: Parameters<T>) => {
+  return ((...actualParameters: Parameters<T>): ReturnType<T> => {
     // eslint-disable-next-line functional/immutable-data
     const mock = mocks.shift();
 
@@ -118,11 +116,11 @@ export const createFunctionMock = <T extends (...parameters: Array<any>) => any>
     }
 
     return (mock as { return?: ReturnType<T> }).return as ReturnType<T>;
-  };
+  }) as T;
 };
 
 export const useFunctionMock = <T extends (...parameters: Array<any>) => any>(
   mocks: FunctionMocks<T>,
-): [(...parameters: Parameters<T>) => ReturnType<T>, FunctionMocks<T>] => {
+): [T, FunctionMocks<T>] => {
   return [createFunctionMock(mocks), mocks];
 };
