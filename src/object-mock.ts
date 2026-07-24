@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-invalid-void-type */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* oxlint-disable typescript/no-invalid-void-type */
+/* oxlint-disable typescript/no-explicit-any */
 
 import { deepStrictEqual } from 'node:assert';
 
@@ -43,7 +43,7 @@ export type ObjectMocks<T extends Record<string, any>> = Array<
 export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMocks<T>): T => {
   const line = internalResolveCallerLineFromStack(new Error('capture stack').stack);
 
-  // eslint-disable-next-line functional/no-let
+  // oxlint-disable-next-line functional/no-let
   let mockIndex = 0;
 
   const object = new Proxy({} as T, {
@@ -53,7 +53,7 @@ export const createObjectMock = <T extends Record<string, any>>(mocks: ObjectMoc
         return;
       }
 
-      // eslint-disable-next-line functional/immutable-data
+      // oxlint-disable-next-line functional/immutable-data
       const mock = mocks.shift();
 
       if (!mock) {

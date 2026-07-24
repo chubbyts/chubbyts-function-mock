@@ -197,7 +197,7 @@ describe('function-mock', () => {
       const [myFunction, myFunctionMocks] = useFunctionMock<MyFunction>([{ parameters: ['test', 0, 2], return: 'te' }]);
 
       try {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // oxlint-disable-next-line typescript/ban-ts-comment
         // @ts-ignore
         myFunction('test', 0);
         throw new Error('Expect fail');
