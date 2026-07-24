@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-invalid-void-type */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { deepStrictEqual } from 'assert';
+import { deepStrictEqual } from 'node:assert';
 
 const formatContext = (context: { [key: string]: unknown }): string => JSON.stringify(context);
 
@@ -18,7 +18,7 @@ export const internalResolveCallerLineFromStack = (stack?: string): number | und
     }
 
     if (-1 === stackLine.search(/function-mock\.(cjs|js|mjs|ts)/)) {
-      return parseInt(stackLine.split(':')[1]);
+      return Number.parseInt(stackLine.split(':')[1]);
     }
   }
 
@@ -37,7 +37,7 @@ export type FunctionMocks<T extends (...parameters: Array<any>) => any> = Array<
 export const createFunctionMock = <T extends (...parameters: Array<any>) => any>(
   mocks: FunctionMocks<T>,
 ): ((...parameters: Parameters<T>) => ReturnType<T>) => {
-  const line = internalResolveCallerLineFromStack(new Error().stack);
+  const line = internalResolveCallerLineFromStack(new Error('capture stack').stack);
 
   // eslint-disable-next-line functional/no-let
   let mockIndex = 0;

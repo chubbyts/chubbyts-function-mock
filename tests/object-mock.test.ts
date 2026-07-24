@@ -32,7 +32,7 @@ describe('object-mock', () => {
       expect(myObject.type).toBe('value2');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
   });
 
@@ -47,7 +47,7 @@ describe('object-mock', () => {
       expect(myObject.type).toBe('value2');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('mocks with return', async () => {
@@ -66,7 +66,7 @@ describe('object-mock', () => {
       expect(myObject.substring('test', 2, 2, context)).toBe('st');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('use mock within Promise.resolve', async () => {
@@ -79,7 +79,7 @@ describe('object-mock', () => {
       expect(blub.substring('test', 0, 2)).toBe('te');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('use mock within Promise.reject', async () => {
@@ -95,7 +95,7 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('mocks with interface', async () => {
@@ -108,7 +108,7 @@ describe('object-mock', () => {
       expect(myObject.substring('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('mocks with returnSelf', async () => {
@@ -121,7 +121,7 @@ describe('object-mock', () => {
       expect(myObject.self()).toBe(myObject);
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('mocks with return or error', async () => {
@@ -142,7 +142,7 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('mocks with callback function', async () => {
@@ -173,7 +173,7 @@ describe('object-mock', () => {
       expect(myObject.substring('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('mocks with return or callback function', async () => {
@@ -195,7 +195,7 @@ describe('object-mock', () => {
       expect(myObject.substring('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('mocks with return and different methods', async () => {
@@ -216,7 +216,7 @@ describe('object-mock', () => {
       myObject.doesNothing();
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('to less mocks', async () => {
@@ -245,7 +245,7 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('method name mismatch', async () => {
@@ -277,7 +277,7 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('parameters count mismatch', async () => {
@@ -297,7 +297,7 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
 
     test('parameter mismatch', async () => {
@@ -338,7 +338,7 @@ describe('object-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myObjectMocks.length).toBe(0);
+      expect(myObjectMocks).toHaveLength(0);
     });
   });
 

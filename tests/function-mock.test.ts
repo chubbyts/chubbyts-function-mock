@@ -26,7 +26,7 @@ describe('function-mock', () => {
       expect(myFunction('test', 2, 2, context)).toBe('st');
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionMocks.length).toBe(0);
+      expect(myFunctionMocks).toHaveLength(0);
     });
   });
 
@@ -38,7 +38,7 @@ describe('function-mock', () => {
     myFunction();
 
     // if you want to be sure, that all mocks are called
-    expect(myFunctionMocks.length).toBe(0);
+    expect(myFunctionMocks).toHaveLength(0);
   });
 
   describe('useFunctionMock', () => {
@@ -58,7 +58,7 @@ describe('function-mock', () => {
       expect(myFunction('test', 2, 2, context)).toBe('st');
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionMocks.length).toBe(0);
+      expect(myFunctionMocks).toHaveLength(0);
     });
 
     test('mocks with return or error', async () => {
@@ -79,7 +79,7 @@ describe('function-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionMocks.length).toBe(0);
+      expect(myFunctionMocks).toHaveLength(0);
     });
 
     test('mocks with callback function', async () => {
@@ -108,7 +108,7 @@ describe('function-mock', () => {
       expect(myFunction('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionMocks.length).toBe(0);
+      expect(myFunctionMocks).toHaveLength(0);
     });
 
     test('mocks with function', async () => {
@@ -133,7 +133,7 @@ describe('function-mock', () => {
       expect(myFunction('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionMocks.length).toBe(0);
+      expect(myFunctionMocks).toHaveLength(0);
     });
 
     test('mocks with return or callback function', async () => {
@@ -154,7 +154,7 @@ describe('function-mock', () => {
       expect(myFunction('test', 1, 2)).toBe('es');
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionMocks.length).toBe(0);
+      expect(myFunctionMocks).toHaveLength(0);
     });
 
     test('to less mocks', async () => {
@@ -190,7 +190,7 @@ describe('function-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionMocks.length).toBe(0);
+      expect(myFunctionMocks).toHaveLength(0);
     });
 
     test('parameters count mismatch', async () => {
@@ -206,7 +206,7 @@ describe('function-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionMocks.length).toBe(0);
+      expect(myFunctionMocks).toHaveLength(0);
     });
 
     test('parameter mismatch', async () => {
@@ -244,7 +244,7 @@ describe('function-mock', () => {
       }
 
       // if you want to be sure, that all mocks are called
-      expect(myFunctionMocks.length).toBe(0);
+      expect(myFunctionMocks).toHaveLength(0);
     });
   });
 
