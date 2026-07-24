@@ -1,7 +1,7 @@
 {
   "name": "@chubbyts/chubbyts-function-mock",
   "type": "module",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "A function mock helper.",
   "keywords": [
     "chubbyts",
