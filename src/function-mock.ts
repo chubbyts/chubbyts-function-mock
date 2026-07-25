@@ -35,8 +35,8 @@ export type FunctionMocks<T extends (...parameters: Array<any>) => any> = Array<
 >;
 
 export const createFunctionMock = <T extends (...parameters: Array<any>) => any>(mocks: FunctionMocks<T>): T => {
-  // capture stack to resolve the caller line
-  const line = internalResolveCallerLineFromStack(new Error().stack);
+  // Stryker disable next-line StringLiteral: the message is never observed, only the stack is used
+  const line = internalResolveCallerLineFromStack(new Error('capture stack to resolve the caller line').stack);
 
   // oxlint-disable-next-line functional/no-let
   let mockIndex = 0;
